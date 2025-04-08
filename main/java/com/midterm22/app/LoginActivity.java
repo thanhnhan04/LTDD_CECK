@@ -1,5 +1,6 @@
 package com.midterm22.app;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,7 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,17 +24,16 @@ import com.google.firebase.database.ValueEventListener;
 import com.midterm22.app.model.User;
 
 public class LoginActivity extends AppCompatActivity {
+
     private FirebaseAuth mAuth;
     private DatabaseReference usersRef;
     private EditText edtEmail, edtPass;
-    private Button btnLogin;
-    private Button btnRegister;
-
+    private Button btnLogin, btnRegister;
+    private ProgressDialog loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
@@ -44,6 +43,11 @@ public class LoginActivity extends AppCompatActivity {
         edtPass = findViewById(R.id.edt_pass);
         btnLogin = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
+
+        loadingDialog = new ProgressDialog(this);
+        loadingDialog.setMessage("Please wait...");
+        loadingDialog.setCancelable(false);
+
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,16 +71,21 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUser(String email, String password) {
+        loadingDialog.show();
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             if (firebaseUser != null) {
                                 fetchUserData(firebaseUser.getUid());
+                            } else {
+                                loadingDialog.dismiss();
+                                Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
                             }
                         } else {
+                            loadingDialog.dismiss();
                             Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     }
@@ -86,12 +96,13 @@ public class LoginActivity extends AppCompatActivity {
         usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                loadingDialog.dismiss();
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null && user.getRole() != null && !user.getRole().isEmpty()) {
                         navigateToRole(user);
                     } else {
-                        Toast.makeText(LoginActivity.this, "Invalid role data", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Invalid user role", Toast.LENGTH_SHORT).show();
                         signOut();
                     }
                 } else {
@@ -102,6 +113,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                loadingDialog.dismiss();
                 Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 signOut();
             }
@@ -110,24 +122,21 @@ public class LoginActivity extends AppCompatActivity {
 
     private void navigateToRole(User user) {
         String role = user.getRole();
-        String name =user.getName();
-        if ("customer".equals(role)) {
-//            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("user_name", name);
-            startActivity(intent);
+        String name = user.getName();
 
+        Intent intent;
+        if ("customer".equals(role)) {
+            intent = new Intent(LoginActivity.this, MainActivity.class);
         } else if ("admin".equals(role)) {
-//            startActivity(new Intent(LoginActivity.this, AdminActivity.class));
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("user_name", name);
-            startActivity(intent);
+            intent = new Intent(LoginActivity.this, AdminActivity.class); // hoặc AdminActivity nếu bạn có
         } else {
-            Toast.makeText(this, "Unknown user role: " + role, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Unknown role: " + role, Toast.LENGTH_SHORT).show();
             signOut();
             return;
         }
 
+        intent.putExtra("user_name", name);
+        startActivity(intent);
         finish();
     }
 
