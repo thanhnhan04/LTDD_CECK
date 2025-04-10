@@ -38,17 +38,22 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"/>
 
-        <TextView
+        <LinearLayout
             android:id="@+id/edit_account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chỉnh Sửa Tài Khoản "
-            android:textColor="@android:color/white"
-            android:textSize="14sp"
-            android:drawableEnd="@drawable/ic_arrow_right"
             android:layout_below="@id/tv_name"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"/>
+            android:layout_centerHorizontal="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chỉnh Sửa Tài Khoản "
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:drawableEnd="@drawable/ic_arrow_right"
+                android:layout_marginTop="5dp"/>
+        </LinearLayout>
+
     </RelativeLayout>
 
     <!-- Menu Items Section -->
@@ -147,6 +152,7 @@
 
             <!-- Danh sách đơn hàng -->
             <LinearLayout
+                android:id="@+id/lout_list_order"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:orientation="horizontal"
@@ -387,6 +393,7 @@
 
             <!-- Đăng xuất -->
             <LinearLayout
+                android:id="@+id/lout_log_out"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:orientation="horizontal"

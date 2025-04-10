@@ -33,27 +33,25 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate: Starting MainActivity"); // Log 1
+        Log.d(TAG, "onCreate: Starting MainActivity");
 
         setupBottomNavigation(R.layout.activity_main);
-        Log.d(TAG, "Bottom navigation setup completed"); // Log 2
+        Log.d(TAG, "Bottom navigation setup completed");
 
         ViewFlipper viewFlipper = findViewById(R.id.viewFlipper);
         if (viewFlipper != null) {
             viewFlipper.startFlipping();
-            Log.d(TAG, "ViewFlipper started"); // Log 3
+            Log.d(TAG, "ViewFlipper started");
         } else {
-            Log.e(TAG, "ViewFlipper not found"); // Error log
+            Log.e(TAG, "ViewFlipper not found");
         }
 
-        // Kiểm tra user name
         tv_name = findViewById(R.id.tv_name);
         SharedPreferences sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         String userName = sharedPref.getString("user_name", "");
-        Log.d(TAG, "Retrieved user name: " + userName); // Log 4
+        Log.d(TAG, "Retrieved user name: " + userName);
         tv_name.setText(userName);
 
-        // Kiểm tra RecyclerView
         recyclerProducts = findViewById(R.id.recyclerViewProduct);
         if (recyclerProducts == null) {
             Log.e(TAG, "RecyclerView not found");
@@ -63,15 +61,14 @@ public class MainActivity extends BaseActivity {
         recyclerProducts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         productAdapter = new ProductAdapter(this, productList);
         recyclerProducts.setAdapter(productAdapter);
-        Log.d(TAG, "RecyclerView setup completed"); // Log 5
+        Log.d(TAG, "RecyclerView setup completed");
 
-        // Kiểm tra Firebase
         try {
             productRef = FirebaseDatabase.getInstance().getReference("products");
-            Log.d(TAG, "Firebase reference obtained"); // Log 6
+            Log.d(TAG, "Firebase reference obtained");
             loadAllProducts();
         } catch (Exception e) {
-            Log.e(TAG, "Firebase error: " + e.getMessage(), e); // Error log
+            Log.e(TAG, "Firebase error: " + e.getMessage(), e);
         }
     }
 
@@ -90,17 +87,17 @@ public class MainActivity extends BaseActivity {
                     if (product != null && product.isAvailable()) {
                         productList.add(product);
                         productCount++;
-                        Log.d(TAG, "Added product: " + product.getName()); // Log từng sản phẩm
+                        Log.d(TAG, "Added product: " + product.getName());
                     }
                 }
 
-                Log.d(TAG, "Total products loaded: " + productCount); // Log 9
+                Log.d(TAG, "Total products loaded: " + productCount);
                 productAdapter.setProductList(productList);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "onCancelled: " + error.getMessage(), error.toException()); // Error log
+                Log.e(TAG, "onCancelled: " + error.getMessage(), error.toException());
                 Toast.makeText(MainActivity.this, "Lỗi tải dữ liệu: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

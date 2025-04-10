@@ -21,9 +21,13 @@ import java.util.List;
 
 public class MenuActivity extends BaseActivity {
 
-    TextView tab_must_try, tab_burger, tab_pizza, tab_fries, tab_drink;
+    // UI Components
+    TextView tab_must_try, tab_burger, tab_pizza, tab_fries, tab_drink,
+            tab_combo, tab_chicken, tab_noodles; // Thêm 3 TextView mới
     RecyclerView recyclerProducts;
     ProductAdapter productAdapter;
+
+    // Data
     List<Product> productList = new ArrayList<>();
     DatabaseReference productRef;
 
@@ -32,69 +36,135 @@ public class MenuActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setupBottomNavigation(R.layout.activity_menu);
 
+        // Initialize Views
+        initViews();
+        setupRecyclerView();
+        setupClickListeners();
+
+        // Load default data
+        loadAllProducts();
+    }
+
+    private void initViews() {
         tab_must_try = findViewById(R.id.tab_must_try);
         tab_burger = findViewById(R.id.tab_burger);
         tab_pizza = findViewById(R.id.tab_pizza);
         tab_fries = findViewById(R.id.tab_fries);
         tab_drink = findViewById(R.id.tab_drink);
 
+        // Thêm 3 tab mới (đảm bảo đã có trong layout XML)
+        tab_combo = findViewById(R.id.tab_combo);
+        tab_chicken = findViewById(R.id.tab_chicken);
+        tab_noodles = findViewById(R.id.tab_noodles);
+
         recyclerProducts = findViewById(R.id.recycler_product);
+    }
+
+    private void setupRecyclerView() {
         recyclerProducts.setLayoutManager(new LinearLayoutManager(this));
         productAdapter = new ProductAdapter(this, productList);
         recyclerProducts.setAdapter(productAdapter);
         productRef = FirebaseDatabase.getInstance().getReference("products");
-        loadAllProducts();
+    }
 
+    private void setupClickListeners() {
+        // Các tab cũ
         tab_must_try.setOnClickListener(v -> loadAllProducts());
         tab_burger.setOnClickListener(v -> loadProductsByCategory("cat_burger"));
         tab_pizza.setOnClickListener(v -> loadProductsByCategory("cat_pizza"));
         tab_fries.setOnClickListener(v -> loadProductsByCategory("cat_fries"));
         tab_drink.setOnClickListener(v -> loadProductsByCategory("cat_drinks"));
+
+        // 3 tab mới
+        tab_combo.setOnClickListener(v -> loadProductsByCategory("cat_combo"));
+        tab_chicken.setOnClickListener(v -> loadProductsByCategory("cat_chicken"));
+        tab_noodles.setOnClickListener(v -> loadProductsByCategory("cat_noodles"));
     }
 
     private void loadProductsByCategory(String categoryId) {
+        showProgressBar();
+
         productRef.orderByChild("categoryId").equalTo(categoryId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        hideProgressBar();
                         productList.clear();
+
+                        if (!snapshot.exists()) {
+                            showEmptyState();
+                            return;
+                        }
+
                         for (DataSnapshot data : snapshot.getChildren()) {
                             Product product = data.getValue(Product.class);
                             if (product != null && product.isAvailable()) {
-                                Log.d("DEBUG_PRODUCT", "Name: " + product.getName() + ", Image: " + product.getImageUrl());
                                 productList.add(product);
                             }
                         }
-                        Log.d("DEBUG_LIST_SIZE", "Product list size: " + productList.size()); // Thêm dòng này
-                        productAdapter.setProductList(productList);
+
+                        if (productList.isEmpty()) {
+                            showEmptyState();
+                        } else {
+                            productAdapter.setProductList(productList);
+                        }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-                        Log.e("FIREBASE_ERROR", error.getMessage()); // Ghi log lỗi chi tiết
-                        Toast.makeText(MenuActivity.this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                        hideProgressBar();
+                        Log.e("FIREBASE_ERROR", "Failed to load products: " + error.getMessage());
+                        Toast.makeText(MenuActivity.this,
+                                "Lỗi tải danh sách món: " + error.getMessage(),
+                                Toast.LENGTH_LONG).show();
                     }
                 });
     }
+
     private void loadAllProducts() {
+        showProgressBar();
+
         productRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                hideProgressBar();
                 productList.clear();
+
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Product product = data.getValue(Product.class);
                     if (product != null && product.isAvailable()) {
                         productList.add(product);
                     }
                 }
-                productAdapter.setProductList(productList);
+
+                if (productList.isEmpty()) {
+                    showEmptyState();
+                } else {
+                    productAdapter.setProductList(productList);
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MenuActivity.this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                hideProgressBar();
+                Toast.makeText(MenuActivity.this,
+                        "Lỗi tải tất cả món: " + error.getMessage(),
+                        Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    // Helper methods
+    private void showProgressBar() {
+        // Thêm code hiển thị progress bar nếu cần
+    }
+
+    private void hideProgressBar() {
+        // Thêm code ẩn progress bar nếu cần
+    }
+
+    private void showEmptyState() {
+        // Hiển thị layout "Không có món nào" (ví dụ: TextView hoặc ImageView)
+        Toast.makeText(this, "Không có món nào trong danh mục này", Toast.LENGTH_SHORT).show();
+    }
 }
