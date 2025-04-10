@@ -2,6 +2,7 @@ package com.midterm22.app;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -124,23 +125,41 @@ public class LoginActivity extends AppCompatActivity {
         String role = user.getRole();
         String name = user.getName();
 
+        // Lưu username vào SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString("user_name", name);
+        editor.apply();
+
         Intent intent;
         if ("customer".equals(role)) {
             intent = new Intent(LoginActivity.this, MainActivity.class);
         } else if ("admin".equals(role)) {
-            intent = new Intent(LoginActivity.this, AdminActivity.class); // hoặc AdminActivity nếu bạn có
+            intent = new Intent(LoginActivity.this, AdminActivity.class);
         } else {
             Toast.makeText(this, "Unknown role: " + role, Toast.LENGTH_SHORT).show();
-            signOut();
+            //signOut();
             return;
         }
 
-        intent.putExtra("user_name", name);
+        startActivity(intent);
+        finish();
+    }
+    public void signOut() {
+        // Xóa username khỏi SharedPreferences
+        SharedPreferences sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear(); // hoặc editor.remove("user_name");
+        editor.apply();
+
+        // Đăng xuất khỏi Firebase
+        FirebaseAuth.getInstance().signOut();
+
+        // Quay về LoginActivity
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa hết ngăn xếp Activity
         startActivity(intent);
         finish();
     }
 
-    private void signOut() {
-        mAuth.signOut();
-    }
 }

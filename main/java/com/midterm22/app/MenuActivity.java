@@ -37,14 +37,14 @@ public class MenuActivity extends BaseActivity {
         tab_pizza = findViewById(R.id.tab_pizza);
         tab_fries = findViewById(R.id.tab_fries);
         tab_drink = findViewById(R.id.tab_drink);
+
         recyclerProducts = findViewById(R.id.recycler_product);
-        String user_name = getIntent().getStringExtra("user_name");
         recyclerProducts.setLayoutManager(new LinearLayoutManager(this));
         productAdapter = new ProductAdapter(this, productList);
         recyclerProducts.setAdapter(productAdapter);
-
         productRef = FirebaseDatabase.getInstance().getReference("products");
         loadAllProducts();
+
         tab_must_try.setOnClickListener(v -> loadAllProducts());
         tab_burger.setOnClickListener(v -> loadProductsByCategory("cat_burger"));
         tab_pizza.setOnClickListener(v -> loadProductsByCategory("cat_pizza"));

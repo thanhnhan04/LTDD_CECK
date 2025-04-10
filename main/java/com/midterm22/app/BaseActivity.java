@@ -3,46 +3,139 @@ package com.midterm22.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class BaseActivity extends AppCompatActivity {
+    // Khai báo
+    private TextView cartBadge;
+    private int cartItemCount = 0;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Layout chính sẽ được thiết lập trong setupBottomNavigation
+    }
 
     protected void setupBottomNavigation(int layoutResId) {
-        // Set layout cha chứa navigation bar
         super.setContentView(R.layout.base_activity);
 
-        // Gắn layout riêng vào content_frame
+        // Ánh xạ view
+        cartBadge = findViewById(R.id.cart_badge);
+        ImageButton cartButton = findViewById(R.id.cart_button);
+
+        // Xử lý sự kiện click giỏ hàng
+        cartButton.setOnClickListener(v -> {
+            if (!isCurrentActivity(CartActivity.class)) {
+                navigateToActivity(CartActivity.class);
+            }
+        });
+
+        // Khởi tạo số lượng (có thể lấy từ database hoặc shared preferences)
+        updateCartCount(getCartItemCountFromStorage());
+
         FrameLayout contentFrame = findViewById(R.id.content_frame);
         LayoutInflater.from(this).inflate(layoutResId, contentFrame, true);
 
-        // Gán sự kiện các nút điều hướng
+        // Lấy tham chiếu các nút điều hướng
         LinearLayout home = findViewById(R.id.home_id);
         LinearLayout menu = findViewById(R.id.menu_id);
         LinearLayout deal = findViewById(R.id.deal_id);
         LinearLayout more = findViewById(R.id.more_id);
 
+        // Xử lý sự kiện cho nút Home
         home.setOnClickListener(v -> {
-            startActivity(new Intent(this, MainActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            if (!isCurrentActivity(MainActivity.class)) {
+                navigateToActivity(MainActivity.class);
+            }
         });
 
+        // Xử lý sự kiện cho nút Menu
         menu.setOnClickListener(v -> {
-            startActivity(new Intent(this, MenuActivity.class));
-            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            if (!isCurrentActivity(MenuActivity.class)) {
+                navigateToActivity(MenuActivity.class);
+            }
         });
 
-        // Mở nếu có các activity này
+//        // Xử lý sự kiện cho nút Deal/Khuyến mãi
 //        deal.setOnClickListener(v -> {
-//            startActivity(new Intent(this, DealActivity.class));
-//            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+//            if (!isCurrentActivity(DealActivity.class)) {
+//                navigateToActivity(DealActivity.class);
+//            }
 //        });
-//
-//        more.setOnClickListener(v -> {
-//            startActivity(new Intent(this, MoreActivity.class));
-//            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-//        });
+
+        // Xử lý sự kiện cho nút More
+        more.setOnClickListener(v -> {
+            if (!isCurrentActivity(MoreActivity.class)) {
+                navigateToActivity(MoreActivity.class);
+            }
+        });
+    }
+
+    // Phương thức cập nhật số lượng giỏ hàng
+    public void updateCartCount(int count) {
+        cartItemCount = count;
+        if (cartBadge != null) {
+            if (count > 0) {
+                cartBadge.setVisibility(View.VISIBLE);
+                cartBadge.setText(String.valueOf(count));
+
+                // Tự động lưu số lượng khi cập nhật
+                saveCartItemCountToStorage(count);
+            } else {
+                cartBadge.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    // Phương thức thêm sản phẩm vào giỏ
+    public void addToCart() {
+        cartItemCount++;
+        updateCartCount(cartItemCount);
+    }
+
+    // Phương thức xóa sản phẩm khỏi giỏ
+    public void removeFromCart() {
+        if (cartItemCount > 0) {
+            cartItemCount--;
+            updateCartCount(cartItemCount);
+        }
+    }
+
+    // Phương thức lấy số lượng từ SharedPreferences
+    private int getCartItemCountFromStorage() {
+        return getSharedPreferences("APP_PREFS", MODE_PRIVATE)
+                .getInt("CART_ITEM_COUNT", 0);
+    }
+
+    // Phương thức lưu số lượng vào SharedPreferences
+    private void saveCartItemCountToStorage(int count) {
+        getSharedPreferences("APP_PREFS", MODE_PRIVATE)
+                .edit()
+                .putInt("CART_ITEM_COUNT", count)
+                .apply();
+    }
+
+    // Kiểm tra Activity hiện tại
+    private boolean isCurrentActivity(Class<?> activityClass) {
+        return this.getClass().equals(activityClass);
+    }
+
+    // Phương thức chuyển Activity
+    protected void navigateToActivity(Class<?> activityClass) {
+        Intent intent = new Intent(this, activityClass);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    // Lấy số lượng hiện tại trong giỏ hàng
+    public int getCurrentCartCount() {
+        return cartItemCount;
     }
 }
