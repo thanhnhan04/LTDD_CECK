@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Style dùng để chỉnh kích thước chữ trong Navigation Drawer -->
+    <style name="DrawerMenuTextStyle" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">18sp</item> <!-- Bạn có thể tăng lên 20sp nếu muốn to hơn nữa -->
+        <item name="android:textStyle">bold</item> <!-- Tùy chọn, nếu bạn muốn in đậm -->
+    </style>
+</resources>

@@ -24,21 +24,12 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
-        // Toolbar
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false); // Tắt tiêu đề mặc định
-
-//        TextView toolbarTitle = findViewById(R.id.toolbar_title);
-//        toolbarTitle.setText("Quản lý nhà hàng"); // Đặt tiêu đề bạn muốn
-
-        // Drawer
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
 
-        // Hamburger toggle
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open,
@@ -61,7 +52,6 @@ public class AdminActivity extends AppCompatActivity {
             return true;
         });
 
-        // Ánh xạ view
         cardCustomers = findViewById(R.id.cardCustomers);
         cardOrders = findViewById(R.id.cardOrders);
         cardFood = findViewById(R.id.cardFood);
@@ -72,7 +62,6 @@ public class AdminActivity extends AppCompatActivity {
         tvFoodCount = findViewById(R.id.tvFoodCount);
         tvRevenue = findViewById(R.id.tvRevenue);
 
-        // Load dữ liệu thống kê
         loadStatistics();
     }
 

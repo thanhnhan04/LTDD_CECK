@@ -54,7 +54,6 @@
                 android:padding="8dp" />
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- Nội dung giao diện admin -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -136,6 +135,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/drawer_menu" />
+        app:menu="@menu/drawer_menu"
+        app:itemTextAppearance="@style/DrawerMenuTextStyle" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
