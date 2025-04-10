@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/base_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -83,7 +84,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_person"
+                android:src="@drawable/ic_discount"
                 android:contentDescription="Khuyến mãi"/>
 
             <TextView
@@ -116,5 +117,44 @@
                 android:textSize="12sp"/>
         </LinearLayout>
     </LinearLayout>
+    <!-- Nút Giỏ Hàng với Container để thêm Badge -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cart_button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp">
+
+        <ImageButton
+            android:id="@+id/cart_button"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@drawable/bg_circle_cart"
+            android:src="@drawable/ic_pickup"
+            android:scaleType="centerInside"
+            android:contentDescription="Giỏ hàng"
+            android:elevation="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            tools:ignore="MissingConstraints" />
+
+        <!-- Badge hiển thị số lượng -->
+        <TextView
+            android:id="@+id/cart_badge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/badge_background"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="@id/cart_button"
+            app:layout_constraintEnd_toEndOf="@id/cart_button"
+            android:layout_marginTop="-5dp"
+            android:layout_marginEnd="-5dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
