@@ -2,7 +2,6 @@ package com.midterm22.app;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.widget.TextView;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,7 +42,11 @@ public class AdminActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
                 // Trang chính
-            } else if (id == R.id.nav_logout) {
+            }else if (id == R.id.nav_qldh) {
+                // 👉 Quản lý đơn hàng
+                Intent intent = new Intent(this, ManagerOrderActivity.class);
+                startActivity(intent);
+            }else if (id == R.id.nav_logout) {
                 // Đăng xuất
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();
