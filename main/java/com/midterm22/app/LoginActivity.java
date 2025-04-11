@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -146,20 +147,16 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
     public void signOut() {
-        // Xóa username khỏi SharedPreferences
         SharedPreferences sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.clear(); // hoặc editor.remove("user_name");
+        editor.clear();
         editor.apply();
 
-        // Đăng xuất khỏi Firebase
         FirebaseAuth.getInstance().signOut();
 
-        // Quay về LoginActivity
         Intent intent = new Intent(this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa hết ngăn xếp Activity
         startActivity(intent);
         finish();
     }
-
 }

@@ -83,4 +83,23 @@ public class Order {
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
+    // Chuyển thành Map để lưu lên Firebase
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", id);
+        map.put("customerId", customerId);
+
+        // Chuyển các OrderItem thành Map
+        Map<String, Object> itemsMap = new HashMap<>();
+        for (Map.Entry<String, OrderItem> entry : items.entrySet()) {
+            itemsMap.put(entry.getKey(), entry.getValue().toMap());
+        }
+        map.put("items", itemsMap);
+
+        map.put("total", total);
+        map.put("status", status);
+        map.put("createdAt", createdAt);
+        map.put("updatedAt", updatedAt);
+        return map;
+    }
 }
