@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.midterm22.app.model.Order;
 import com.midterm22.app.model.Product;
 
 import java.util.List;
@@ -19,12 +20,16 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private List<Product> productList;
     private Context context;
+    private OnProductClickListener listener;
 
-    public ProductAdapter(Context context, List<Product> productList) {
+    public ProductAdapter(Context context, List<Product> productList, OnProductClickListener listener) {
         this.context = context;
         this.productList = productList;
+        this.listener = listener;
     }
-
+    public interface OnProductClickListener {
+        void onProductClick(Product product);
+    }
     public void setProductList(List<Product> list) {
         this.productList = list;
         notifyDataSetChanged();
@@ -49,6 +54,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
                 .placeholder(R.drawable.load_img) // ảnh tạm thời
                 .error(R.drawable.error_image)       // ảnh nếu lỗi
                 .into(holder.imgProduct);
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onProductClick(product);
+            }
+        });
 
     }
 

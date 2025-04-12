@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:text="Combo"
                 android:textAlignment="center"
-                android:drawableTop="@drawable/ic_pizza"
+                android:drawableTop="@drawable/ic_combo"
                 android:padding="12dp"
                 android:textColor="#888888" />
             <TextView
@@ -103,7 +103,7 @@
                 android:layout_height="wrap_content"
                 android:text="Gà rán"
                 android:textAlignment="center"
-                android:drawableTop="@drawable/ic_fries"
+                android:drawableTop="@drawable/ic_chicken"
                 android:padding="12dp"
                 android:textColor="#888888" />
 
@@ -113,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:text="Mỳ ý"
                 android:textAlignment="center"
-                android:drawableTop="@drawable/ic_drink"
+                android:drawableTop="@drawable/ic_pasta"
                 android:padding="12dp"
                 android:textColor="#888888" />
         </LinearLayout>

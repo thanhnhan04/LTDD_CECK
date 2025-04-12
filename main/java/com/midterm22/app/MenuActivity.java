@@ -1,11 +1,14 @@
 package com.midterm22.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,12 +17,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.midterm22.app.model.Order;
 import com.midterm22.app.model.Product;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuActivity extends BaseActivity {
+public class MenuActivity extends BaseActivity implements ProductAdapter.OnProductClickListener {
 
     // UI Components
     TextView tab_must_try, tab_burger, tab_pizza, tab_fries, tab_drink,
@@ -27,7 +31,6 @@ public class MenuActivity extends BaseActivity {
     RecyclerView recyclerProducts;
     ProductAdapter productAdapter;
 
-    // Data
     List<Product> productList = new ArrayList<>();
     DatabaseReference productRef;
 
@@ -61,8 +64,9 @@ public class MenuActivity extends BaseActivity {
     }
 
     private void setupRecyclerView() {
-        recyclerProducts.setLayoutManager(new LinearLayoutManager(this));
-        productAdapter = new ProductAdapter(this, productList);
+        recyclerProducts.setHasFixedSize(true);
+        recyclerProducts.setLayoutManager(new GridLayoutManager(this, 2)); // 2 cột
+        productAdapter = new ProductAdapter(this, productList,this);
         recyclerProducts.setAdapter(productAdapter);
         productRef = FirebaseDatabase.getInstance().getReference("products");
     }
@@ -79,6 +83,7 @@ public class MenuActivity extends BaseActivity {
         tab_combo.setOnClickListener(v -> loadProductsByCategory("cat_combo"));
         tab_chicken.setOnClickListener(v -> loadProductsByCategory("cat_chicken"));
         tab_noodles.setOnClickListener(v -> loadProductsByCategory("cat_noodles"));
+
     }
 
     private void loadProductsByCategory(String categoryId) {
@@ -166,5 +171,13 @@ public class MenuActivity extends BaseActivity {
     private void showEmptyState() {
         // Hiển thị layout "Không có món nào" (ví dụ: TextView hoặc ImageView)
         Toast.makeText(this, "Không có món nào trong danh mục này", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onProductClick(Product product) {
+        Intent intent = new Intent(MenuActivity.this, ProductDetailActivity.class); // thay CurrentActivity bằng tên activity hiện tại
+        // Nếu muốn truyền dữ liệu, thêm vào intent.putExtra()
+        intent.putExtra("product_id", product.getId()); // ví dụ truyền id món ăn
+        startActivity(intent);
     }
 }

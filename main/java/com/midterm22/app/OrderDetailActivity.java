@@ -164,7 +164,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     }
 
     private void reorder() {
-        // TODO: Triển khai chức năng đặt lại
+
         Toast.makeText(this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
     }
 }

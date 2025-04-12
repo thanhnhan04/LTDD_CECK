@@ -1,5 +1,6 @@
 package com.midterm22.app;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements ProductAdapter.OnProductClickListener {
     private static final String TAG = "MainActivity";
     TextView tv_name;
     RecyclerView recyclerProducts;
@@ -59,7 +60,7 @@ public class MainActivity extends BaseActivity {
         }
 
         recyclerProducts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        productAdapter = new ProductAdapter(this, productList);
+        productAdapter = new ProductAdapter(this, productList, this);
         recyclerProducts.setAdapter(productAdapter);
         Log.d(TAG, "RecyclerView setup completed");
 
@@ -101,5 +102,13 @@ public class MainActivity extends BaseActivity {
                 Toast.makeText(MainActivity.this, "Lỗi tải dữ liệu: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onProductClick(Product product) {
+        Intent intent = new Intent(MainActivity.this, ProductDetailActivity.class); // thay CurrentActivity bằng tên activity hiện tại
+        // Nếu muốn truyền dữ liệu, thêm vào intent.putExtra()
+        intent.putExtra("product_id", product.getId()); // ví dụ truyền id món ăn
+        startActivity(intent);
     }
 }
