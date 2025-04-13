@@ -85,18 +85,7 @@
             android:orientation="horizontal"
             android:gravity="center">
 
-            <Button
-                android:id="@+id/btn_add_to_cart"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="Thêm vào giỏ"
-                android:textAllCaps="false"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#FFA000" />
+
 
             <Button
                 android:id="@+id/btn_buy_now"

@@ -1,13 +1,17 @@
 package com.midterm22.app;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     private DatabaseReference usersRef;
     private EditText edtEmail, edtPass;
     private Button btnLogin, btnRegister;
-    private ProgressDialog loadingDialog;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,60 +49,65 @@ public class LoginActivity extends AppCompatActivity {
         edtPass = findViewById(R.id.edt_pass);
         btnLogin = findViewById(R.id.btn_login);
         btnRegister = findViewById(R.id.btn_register);
+        progressBar = findViewById(R.id.progressBar);  // Corrected ID
 
-        loadingDialog = new ProgressDialog(this);
-        loadingDialog.setMessage("Please wait...");
-        loadingDialog.setCancelable(false);
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String email = edtEmail.getText().toString().trim();
-                String pass = edtPass.getText().toString().trim();
+        btnLogin.setOnClickListener(v -> {
+            String email = edtEmail.getText().toString().trim();
+            String pass = edtPass.getText().toString().trim();
 
-                if (email.isEmpty() || pass.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
-                } else {
-                    loginUser(email, pass);
-                }
+            if (email.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            } else if (!isNetworkAvailable()) {
+                Toast.makeText(LoginActivity.this, "No internet connection", Toast.LENGTH_SHORT).show();
+            } else {
+                loginUser(email, pass);
             }
         });
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-            }
-        });
+        btnRegister.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnected();
+    }
+
+    private void showLoading(boolean show) {
+        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        btnLogin.setEnabled(!show);  // Disable login button while loading
+        btnRegister.setEnabled(!show);  // Disable register button while loading
     }
 
     private void loginUser(String email, String password) {
-        loadingDialog.show();
+        showLoading(true);
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                            if (firebaseUser != null) {
-                                fetchUserData(firebaseUser.getUid());
-                            } else {
-                                loadingDialog.dismiss();
-                                Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
-                            }
+                .addOnCompleteListener(LoginActivity.this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            fetchUserData(firebaseUser.getUid());
                         } else {
-                            loadingDialog.dismiss();
-                            Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                            showLoading(false);
+                            Toast.makeText(LoginActivity.this, "User not found", Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        showLoading(false);
+                        Toast.makeText(LoginActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
 
     private void fetchUserData(String userId) {
+        long startTime = System.currentTimeMillis();
         usersRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                loadingDialog.dismiss();
+                showLoading(false);
+                long elapsed = System.currentTimeMillis() - startTime;
+                Log.d("LOGIN_PERF", "Data fetched in: " + elapsed + " ms");
+
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null && user.getRole() != null && !user.getRole().isEmpty()) {
@@ -115,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                loadingDialog.dismiss();
+                showLoading(false);
                 Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 signOut();
             }
@@ -126,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
         String role = user.getRole();
         String name = user.getName();
 
-        // Lưu username vào SharedPreferences
+        // Save username in SharedPreferences
         SharedPreferences sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("user_name", name);
@@ -139,13 +148,13 @@ public class LoginActivity extends AppCompatActivity {
             intent = new Intent(LoginActivity.this, AdminActivity.class);
         } else {
             Toast.makeText(this, "Unknown role: " + role, Toast.LENGTH_SHORT).show();
-            //signOut();
             return;
         }
 
         startActivity(intent);
-        finish();
+        new Handler().postDelayed(() -> finish(), 300); // Prevent ANR when switching quickly
     }
+
     public void signOut() {
         SharedPreferences sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -155,7 +164,7 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().signOut();
 
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Xóa hết ngăn xếp Activity
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

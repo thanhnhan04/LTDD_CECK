@@ -1,0 +1,192 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Header cố định -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/red"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/c_arrow_back"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Thông tin đơn hàng"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
+    <!-- Nội dung scroll -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/footer"
+        android:layout_below="@id/header">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Shop Info -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Giao từ cửa hàng: 93 Nguyễn Lương Bằng- Liên Chiểu - Đà Nẵng"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Địa chỉ: tổ 4 Thôn Phú Hạ, Hòa Sơn, Hòa Vang, Đà Nẵng, Việt Nam"
+                android:textColor="@color/black" />
+
+            <!-- Tên & SDT -->
+            <EditText
+                android:id="@+id/edt_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Họ và tên (*)"
+                android:text="Nguyễn Hằng"
+                android:layout_marginTop="12dp"
+
+                android:padding="10dp" />
+
+            <EditText
+                android:id="@+id/edt_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Số điện thoại (*)"
+                android:text="0898401470"
+                android:inputType="phone"
+                android:layout_marginTop="8dp"
+
+                android:padding="10dp" />
+
+
+
+            <!-- Danh sách món -->
+            <LinearLayout
+                android:id="@+id/product_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+                <!-- Product Info -->
+                <TextView
+                    android:id="@+id/tv_product_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:id="@+id/tv_product_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- Bộ chọn số lượng -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <ImageButton
+                        android:id="@+id/btn_decrease"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:backgroundTint="#D50000"
+                        android:src="@drawable/ic_minus"
+                        android:background="@drawable/bg_rounded_red"
+                        app:tint="#FFFFFF" />
+
+                    <!-- Chuyển thành EditText không thể chỉnh sửa -->
+                    <EditText
+                        android:id="@+id/tv_quantity"
+                        android:layout_width="64dp"
+                        android:layout_height="48dp"
+                        android:gravity="center"
+                        android:text="1"
+                        android:textSize="16sp"
+                        android:background="@drawable/bg_rounded_white"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:inputType="none" />
+
+                    <ImageButton
+                        android:id="@+id/btn_increase"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:backgroundTint="#D50000"
+                        android:src="@drawable/ic_add"
+                        android:background="@drawable/bg_rounded_red"
+                        app:tint="#FFFFFF" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Footer cố định -->
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@color/white"
+        android:elevation="4dp">
+
+        <!-- Payment Method -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thanh toán bằng:"
+            android:layout_marginTop="16dp" />
+
+        <!-- Total Price -->
+        <TextView
+            android:id="@+id/txt_total"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0 đ"
+            android:textColor="@color/red"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="end" />
+
+        <!-- Order Button -->
+        <Button
+            android:id="@+id/btn_order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đặt hàng"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/red"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
+</RelativeLayout>

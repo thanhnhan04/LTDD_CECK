@@ -100,6 +100,15 @@
             app:backgroundTint="#FFC107"
             app:cornerRadius="8dp"
             app:rippleColor="@color/colorPrimaryDark"/>
+        <!-- ProgressBar - Thêm vào vị trí mong muốn, ví dụ ngay sau nút đăng nhập -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            android:indeterminate="true"
+            android:layout_gravity="center"/>
 
         <!-- Divider -->
         <RelativeLayout

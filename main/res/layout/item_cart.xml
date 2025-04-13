@@ -65,13 +65,14 @@
                 android:orientation="horizontal"
                 android:gravity="center">
 
-                <Button
+                <ImageButton
                     android:id="@+id/btn_decrease"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:text="-"
-                    android:textSize="14sp"
-                    android:background="@drawable/bg_circle_outline" />
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:backgroundTint="#D50000"
+                    android:src="@drawable/ic_minus"
+                    android:background="@drawable/bg_rounded_red"
+                    app:tint="#FFFFFF" />
 
                 <TextView
                     android:id="@+id/tv_quantity"
@@ -81,13 +82,14 @@
                     android:gravity="center"
                     android:textSize="14sp" />
 
-                <Button
+                <ImageButton
                     android:id="@+id/btn_increase"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:text="+"
-                    android:textSize="14sp"
-                    android:background="@drawable/bg_circle_outline" />
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:backgroundTint="#D50000"
+                    android:src="@drawable/ic_add"
+                    android:background="@drawable/bg_rounded_red"
+                    app:tint="#FFFFFF" />
             </LinearLayout>
 
             <ImageView
