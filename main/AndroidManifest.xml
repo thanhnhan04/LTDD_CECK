@@ -17,6 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App"
         tools:targetApi="31">
+        <activity android:name=".FoodManagementActivity" />
+        <activity android:name=".AddEditFoodActivity"/>
+        <activity android:name=".CustomerManagementActivity" />
+        <activity android:name=".CustomerDetailActivity" />
         <activity
             android:name=".MenuActivity"
             android:exported="false" />

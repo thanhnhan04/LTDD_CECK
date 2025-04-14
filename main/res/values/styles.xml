@@ -5,4 +5,12 @@
         <item name="android:textSize">18sp</item> <!-- Bạn có thể tăng lên 20sp nếu muốn to hơn nữa -->
         <item name="android:textStyle">bold</item> <!-- Tùy chọn, nếu bạn muốn in đậm -->
     </style>
+    <style name="ToolbarTitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
 </resources>

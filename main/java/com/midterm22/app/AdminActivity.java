@@ -46,10 +46,18 @@ public class AdminActivity extends AppCompatActivity {
                 // 👉 Quản lý đơn hàng
                 Intent intent = new Intent(this, ManagerOrderActivity.class);
                 startActivity(intent);
+            }
+            else if (id == R.id.nav_qlsp) {
+                // 👉 Quản lý sản phẩm (Món ăn)
+                startActivity(new Intent(this, FoodManagementActivity.class));
+
             }else if (id == R.id.nav_logout) {
                 // Đăng xuất
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();
+            }
+            if (id == R.id.nav_qlkh) { // Thêm ID mới trong menu.xml
+                startActivity(new Intent(this, CustomerManagementActivity.class));
             }
             drawerLayout.closeDrawers();
             return true;
@@ -58,6 +66,10 @@ public class AdminActivity extends AppCompatActivity {
         cardCustomers = findViewById(R.id.cardCustomers);
         cardOrders = findViewById(R.id.cardOrders);
         cardFood = findViewById(R.id.cardFood);
+        cardFood.setOnClickListener(v -> {
+            startActivity(new Intent(this, FoodManagementActivity.class));
+        });
+
         cardStats = findViewById(R.id.cardStats);
 
         tvCustomerCount = findViewById(R.id.tvCustomerCount);

@@ -1,7 +1,8 @@
 package com.midterm22.app.model;
 
+import java.io.Serializable;
 
-public class Product {
+public class Product implements Serializable {
     private String id;
     private String name;
     private String description;
@@ -15,7 +16,9 @@ public class Product {
     public Product() {
     }
 
-    public Product(String id, String name, String description, double price, String categoryId, String imageUrl, boolean isAvailable, String createdAt, String updatedAt) {
+    public Product(String id, String name, String description, double price,
+                   String categoryId, String imageUrl, boolean isAvailable,
+                   String createdAt, String updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
