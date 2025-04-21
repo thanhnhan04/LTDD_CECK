@@ -18,13 +18,13 @@ public class CartStorageHelper {
         SharedPreferences.Editor editor = prefs.edit();
         Gson gson = new Gson();
         String json = gson.toJson(cart);
-        editor.putString(KEY_CART + "_" + userId, json);  // Store cart with user ID as part of the key
+        editor.putString(KEY_CART + "_" + userId, json);
         editor.apply();
     }
 
     public static Cart getCart(Context context, String userId) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        String json = prefs.getString(KEY_CART + "_" + userId, null);  // Retrieve cart based on user ID
+        String json = prefs.getString(KEY_CART + "_" + userId, null);
         if (json != null) {
             Gson gson = new Gson();
             Type type = new TypeToken<Cart>() {}.getType();
