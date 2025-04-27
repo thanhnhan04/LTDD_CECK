@@ -23,17 +23,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <!-- Nút menu (Navigation Drawer) -->
-<!--                <ImageButton-->
-<!--                    android:id="@+id/btnMenu"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:layout_alignParentStart="true"-->
-<!--                    android:background="?attr/selectableItemBackgroundBorderless"-->
-<!--                    android:contentDescription="Menu"-->
-<!--                    android:padding="12dp"-->
-<!--                    android:src="@drawable/ic_menu" />-->
-
                 <!-- Tiêu đề -->
                 <TextView
                     android:id="@+id/toolbar_title"
@@ -94,10 +83,22 @@
                     android:background="@drawable/selector_menu_option"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="4dp"
-                    android:text="Tất cả"
+                    android:text="All"
                     android:textColor="@color/selector_menu_text"
                     android:textSize="16sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/optionPending"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:background="@drawable/selector_menu_option"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="Pending"
+                    android:textColor="@color/selector_menu_text"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/optionConfirm"
@@ -107,19 +108,7 @@
                     android:background="@drawable/selector_menu_option"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="4dp"
-                    android:text="Xác nhận"
-                    android:textColor="@color/selector_menu_text"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/optionPackaging"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="12dp"
-                    android:background="@drawable/selector_menu_option"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:text="In đơn _ Đang chế biến"
+                    android:text="Confirm"
                     android:textColor="@color/selector_menu_text"
                     android:textSize="16sp" />
 
@@ -131,7 +120,7 @@
                     android:background="@drawable/selector_menu_option"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="4dp"
-                    android:text="Đang giao"
+                    android:text="Shipping"
                     android:textColor="@color/selector_menu_text"
                     android:textSize="16sp" />
 
@@ -143,7 +132,19 @@
                     android:background="@drawable/selector_menu_option"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="4dp"
-                    android:text="Hoàn thành"
+                    android:text="Complete"
+                    android:textColor="@color/selector_menu_text"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/optionCancelled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="12dp"
+                    android:background="@drawable/selector_menu_option"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="Cancelled"
                     android:textColor="@color/selector_menu_text"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -173,6 +174,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/drawer_menu_ad"
+        app:menu="@menu/drawer_menu"
         app:itemTextAppearance="@style/DrawerMenuTextStyle" />
 </androidx.drawerlayout.widget.DrawerLayout>

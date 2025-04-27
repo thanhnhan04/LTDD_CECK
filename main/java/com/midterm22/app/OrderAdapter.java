@@ -163,13 +163,15 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             if (status == null) return "N/A";
             switch (status) {
                 case "pending":
-                    return "Chờ xử lý";
-                case "processing":
-                    return "Đang giao";
+                    return "Confirm";
+                case "Confirm":
+                    return "Confirm";
+                case "Shipping":
+                    return "Shipping";
                 case "completed":
-                    return "Hoàn thành";
+                    return "Complete";
                 case "cancelled":
-                    return "Đã hủy";
+                    return "Cancelled";
                 default:
                     return status;
             }
@@ -180,6 +182,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             switch (status) {
                 case "pending":
                     return 0xFFFB8C00; // Orange
+                case "confirm":
+                    return 0xFFFFC107; // Yellow (Amber)
                 case "processing":
                     return 0xFF1976D2; // Blue
                 case "completed":

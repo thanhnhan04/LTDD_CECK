@@ -25,6 +25,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.midterm22.app.model.Order;
 
@@ -40,7 +41,7 @@ public class ManagerOrderActivity extends AppCompatActivity {
     private final List<Order> filteredOrders = new ArrayList<>();
     private ImageButton btnSearch;
     private ImageView btnProfile;
-    private TextView optionAll, optionConfirm, optionPackaging, optionShipping, optionCompleted;
+    private TextView optionAll, optionPending, optionConfirm, optionShipping, optionCompleted, optionCancelled;
     private FirebaseAuth mAuth;
 
     @Override
@@ -120,15 +121,32 @@ public class ManagerOrderActivity extends AppCompatActivity {
 
     private void fetchOrders() {
         DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference("orders");
-        ordersRef.addValueEventListener(new ValueEventListener() {
+        // Sắp xếp theo child "createdAt" (giả sử bạn có trường này) và giới hạn 100 đơn hàng
+        Query query = ordersRef.orderByChild("createdAt").limitToLast(100);
+
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 orders.clear();
                 filteredOrders.clear();
+
+                // Đảo ngược thứ tự bằng cách lặp từ cuối lên đầu
+                List<DataSnapshot> snapshots = new ArrayList<>();
                 for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
+                    snapshots.add(orderSnapshot);
+                }
+
+                // Lặp ngược để đảo thứ tự
+                for (int i = snapshots.size() - 1; i >= 0; i--) {
+                    DataSnapshot orderSnapshot = snapshots.get(i);
                     try {
                         Order order = orderSnapshot.getValue(Order.class);
                         if (order != null) {
+                            // Đặt trạng thái mặc định là "Đang chờ" nếu status là null
+                            if (order.getStatus() == null) {
+                                order.setStatus("Pending");
+                                ordersRef.child(orderSnapshot.getKey()).child("status").setValue("Pending");
+                            }
                             orders.add(order);
                             filteredOrders.add(order);
                         }
@@ -136,10 +154,10 @@ public class ManagerOrderActivity extends AppCompatActivity {
                         Log.e("ManagerOrderActivity", "Error parsing order: " + orderSnapshot.getKey() + ", Error: " + e.getMessage());
                     }
                 }
+
                 if (orders.isEmpty()) {
                     Toast.makeText(ManagerOrderActivity.this, "Không có đơn hàng nào!", Toast.LENGTH_SHORT).show();
                 }
-                // Kiểm tra adapter không null trước khi gọi notifyDataSetChanged
                 if (adapter != null) {
                     adapter.notifyDataSetChanged();
                 } else {
@@ -161,7 +179,7 @@ public class ManagerOrderActivity extends AppCompatActivity {
             filteredOrders.addAll(orders);
         } else {
             for (Order order : orders) {
-                if (order.getStatus() != null && order.getStatus().equalsIgnoreCase(status)) {
+                if (order.getStatus() != null && order.getStatus().equals(status)) {
                     filteredOrders.add(order);
                 }
             }
@@ -173,19 +191,21 @@ public class ManagerOrderActivity extends AppCompatActivity {
 
     private void setupMenuOptions() {
         optionAll = findViewById(R.id.optionAll);
+        optionPending = findViewById(R.id.optionPending);
         optionConfirm = findViewById(R.id.optionConfirm);
-        optionPackaging = findViewById(R.id.optionPackaging);
         optionShipping = findViewById(R.id.optionShipping);
         optionCompleted = findViewById(R.id.optionCompleted);
+        optionCancelled = findViewById(R.id.optionCancelled);
 
         optionAll.setSelected(true);
 
         View.OnClickListener menuOptionClickListener = v -> {
             optionAll.setSelected(false);
+            optionPending.setSelected(false);
             optionConfirm.setSelected(false);
-            optionPackaging.setSelected(false);
             optionShipping.setSelected(false);
             optionCompleted.setSelected(false);
+            optionCancelled.setSelected(false);
             v.setSelected(true);
         };
 
@@ -193,49 +213,54 @@ public class ManagerOrderActivity extends AppCompatActivity {
             filterOrders("all");
             menuOptionClickListener.onClick(v);
         });
-        optionConfirm.setOnClickListener(v -> {
-            filterOrders("pending");
+        optionPending.setOnClickListener(v -> {
+            filterOrders("Pending");
             menuOptionClickListener.onClick(v);
         });
-        optionPackaging.setOnClickListener(v -> {
-            filterOrders("processing");
+        optionConfirm.setOnClickListener(v -> {
+            filterOrders("Confirm");
             menuOptionClickListener.onClick(v);
         });
         optionShipping.setOnClickListener(v -> {
-            filterOrders("shipping");
+            filterOrders("Shipping");
             menuOptionClickListener.onClick(v);
         });
         optionCompleted.setOnClickListener(v -> {
-            filterOrders("completed");
+            filterOrders("Complete");
+            menuOptionClickListener.onClick(v);
+        });
+        optionCancelled.setOnClickListener(v -> {
+            filterOrders("Cancelled");
             menuOptionClickListener.onClick(v);
         });
     }
 
     private void updateMenuOptionSelection(String status) {
         optionAll.setSelected(false);
+        optionPending.setSelected(false);
         optionConfirm.setSelected(false);
-        optionPackaging.setSelected(false);
         optionShipping.setSelected(false);
         optionCompleted.setSelected(false);
+        optionCancelled.setSelected(false);
 
         switch (status) {
             case "all":
                 optionAll.setSelected(true);
                 break;
-            case "pending":
+            case "Pending":
+                optionPending.setSelected(true);
+                break;
+            case "Confirm":
                 optionConfirm.setSelected(true);
                 break;
-            case "processing":
-                optionPackaging.setSelected(true);
-                break;
-            case "Indon_chebien":
-                optionPackaging.setSelected(true);
-                break;
-            case "shipping":
+            case "Shipping":
                 optionShipping.setSelected(true);
                 break;
-            case "completed":
+            case "Complete":
                 optionCompleted.setSelected(true);
+                break;
+            case "Cancelled":
+                optionCancelled.setSelected(true);
                 break;
         }
     }

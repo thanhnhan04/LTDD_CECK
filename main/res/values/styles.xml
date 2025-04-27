@@ -19,6 +19,9 @@
         <item name="android:textSize">14sp</item>
         <item name="fontFamily">sans-serif-medium</item>
     </style>
-
+    <style name="CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 
 </resources>

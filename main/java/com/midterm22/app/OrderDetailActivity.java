@@ -3,9 +3,11 @@ package com.midterm22.app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,7 @@ import com.midterm22.app.model.OrderItem;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -34,12 +37,14 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private TextView tvOrderId, tvOrderDate, tvTotalAmount, tvCustomerName, tvCustomerPhone, tvCustomerAddress, tvTotalAmountFooter;
     private RecyclerView rvOrderItems;
-    private Button btnCancelOrder, btnUpdateStatus;
+    private Button btnCancelOrder;
+    private Spinner spinnerUpdateStatus;
     private ImageButton btnSearch;
     private ImageView btnProfile;
     private OrderItemAdapter itemAdapter;
     private List<OrderItem> orderItems = new ArrayList<>();
     private String orderId;
+    private List<String> statusList = Arrays.asList("Pending", "Confirm", "Shipping", "Complete", "Cancelled");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +76,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         tvTotalAmountFooter = findViewById(R.id.tvTotalAmountFooter);
         rvOrderItems = findViewById(R.id.rvOrderItems);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
-        btnUpdateStatus = findViewById(R.id.btnUpdateStatus);
+        spinnerUpdateStatus = findViewById(R.id.spinnerUpdateStatus);
         btnSearch = findViewById(R.id.btnSearch);
         btnProfile = findViewById(R.id.btnProfile);
 
@@ -79,6 +84,11 @@ public class OrderDetailActivity extends AppCompatActivity {
         rvOrderItems.setLayoutManager(new LinearLayoutManager(this));
         itemAdapter = new OrderItemAdapter(this, orderItems);
         rvOrderItems.setAdapter(itemAdapter);
+
+        // Thiết lập Spinner cho trạng thái đơn hàng
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, statusList);
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerUpdateStatus.setAdapter(statusAdapter);
 
         // Xử lý nút tìm kiếm
         btnSearch.setOnClickListener(v -> {
@@ -96,8 +106,19 @@ public class OrderDetailActivity extends AppCompatActivity {
         // Xử lý nút Hủy đơn hàng
         btnCancelOrder.setOnClickListener(v -> cancelOrder());
 
-        // Xử lý nút Cập nhật trạng thái
-        btnUpdateStatus.setOnClickListener(v -> updateOrderStatus());
+        // Xử lý sự kiện chọn trạng thái từ Spinner
+        spinnerUpdateStatus.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                String selectedStatus = statusList.get(position);
+                updateOrderStatus(selectedStatus);
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+                // Không làm gì khi không có trạng thái nào được chọn
+            }
+        });
     }
 
     private void fetchOrderDetails() {
@@ -128,6 +149,15 @@ public class OrderDetailActivity extends AppCompatActivity {
                     Log.w("OrderDetailActivity", "Error formatting date: " + createdAt);
                 }
                 tvOrderDate.setText(formattedDate);
+
+                // Hiển thị trạng thái hiện tại trong Spinner
+                String currentStatus = order.getStatus() != null ? order.getStatus() : "Đang chờ";
+                int statusIndex = statusList.indexOf(currentStatus);
+                if (statusIndex != -1) {
+                    spinnerUpdateStatus.setSelection(statusIndex);
+                } else {
+                    spinnerUpdateStatus.setSelection(0); // Mặc định là "Đang chờ"
+                }
 
                 // Lấy thông tin khách hàng
                 fetchCustomerDetails(order.getCustomerId());
@@ -205,9 +235,10 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private void cancelOrder() {
         DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
-        orderRef.child("status").setValue("cancelled").addOnCompleteListener(task -> {
+        orderRef.child("status").setValue("Hủy").addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(OrderDetailActivity.this, "Đơn hàng đã bị hủy!", Toast.LENGTH_SHORT).show();
+                spinnerUpdateStatus.setSelection(statusList.indexOf("Hủy"));
                 finish();
             } else {
                 Toast.makeText(OrderDetailActivity.this, "Lỗi khi hủy đơn hàng!", Toast.LENGTH_SHORT).show();
@@ -215,44 +246,16 @@ public class OrderDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void updateOrderStatus() {
+    private void updateOrderStatus(String newStatus) {
         DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
-        orderRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Order order = snapshot.getValue(Order.class);
-                if (order != null) {
-                    String currentStatus = order.getStatus();
-                    String newStatus;
-                    switch (currentStatus) {
-                        case "pending":
-                            newStatus = "In đơn & chế biến";
-                            break;
-                        case "In đơn & chế biến":
-                            newStatus = "Đang giao";
-                            break;
-                        case "Đang giao":
-                            newStatus = "Hoàn thành";
-                            break;
-                        default:
-                            newStatus = currentStatus;
-                            Toast.makeText(OrderDetailActivity.this, "Không thể cập nhật trạng thái!", Toast.LENGTH_SHORT).show();
-                            return;
-                    }
-                    orderRef.child("status").setValue(newStatus).addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công!", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            Toast.makeText(OrderDetailActivity.this, "Lỗi khi cập nhật trạng thái!", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+        orderRef.child("status").setValue(newStatus).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công: " + newStatus, Toast.LENGTH_SHORT).show();
+                if (newStatus.equals("Hủy")) {
+                    finish();
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(OrderDetailActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(OrderDetailActivity.this, "Lỗi khi cập nhật trạng thái!", Toast.LENGTH_SHORT).show();
             }
         });
     }
