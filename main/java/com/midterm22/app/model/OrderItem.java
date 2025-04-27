@@ -4,14 +4,16 @@ public class OrderItem {
     private String productName;
     private double unitPrice;
     private int quantity;
-    private Order order; // Thêm trường để liên kết với Order
 
-    // Constructor
-    public OrderItem(String productName, double unitPrice, int quantity, Order order) {
+    // Constructor rỗng (Firebase cần)
+    public OrderItem() {
+    }
+
+    // Constructor đầy đủ (bạn đang dùng)
+    public OrderItem(String productName, double unitPrice, int quantity) {
         this.productName = productName;
         this.unitPrice = unitPrice;
         this.quantity = quantity;
-        this.order = order;
     }
 
     // Getter và Setter
@@ -37,13 +39,5 @@ public class OrderItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(Order order) {
-        this.order = order;
     }
 }
