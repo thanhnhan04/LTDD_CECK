@@ -2,6 +2,7 @@ package com.midterm22.app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -18,6 +19,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,11 +41,25 @@ public class ManagerOrderActivity extends AppCompatActivity {
     private ImageButton btnSearch;
     private ImageView btnProfile;
     private TextView optionAll, optionConfirm, optionPackaging, optionShipping, optionCompleted;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_managerorder);
+        setContentView(R.layout.activity_manager_order);
+
+        // Khởi tạo Firebase Auth
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "Bạn cần đăng nhập để xem đơn hàng!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(ManagerOrderActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        } else {
+            Log.d("ManagerOrderActivity", "User logged in: " + currentUser.getUid());
+        }
 
         // Thiết lập Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -57,37 +74,15 @@ public class ManagerOrderActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Xử lý sự kiện chọn mục trong Navigation Drawer
         navigationView.setNavigationItemSelectedListener(item -> {
-            String selectedStatus = "all"; // Mặc định
+            String selectedStatus = "all";
             switch (item.getItemId()) {
-//                case R.id.nav_all:
-//                    selectedStatus = "all";
-//                    break;
-//                case R.id.nav_confirm:
-//                    selectedStatus = "pending";
-//                    break;
-//                case R.id.nav_packaging:
-//                    selectedStatus = "processing";
-//                    break;
-//                case R.id.nav_shipping:
-//                    selectedStatus = "shipping";
-//                    break;
-//                case R.id.nav_completed:
-//                    selectedStatus = "completed";
-//                    break;
                 default:
                     Toast.makeText(this, "Chức năng chưa được hỗ trợ!", Toast.LENGTH_SHORT).show();
                     break;
             }
-
-            // Lọc danh sách đơn hàng theo trạng thái
             filterOrders(selectedStatus);
-
-            // Đồng bộ trạng thái chọn trong HorizontalScrollView
             updateMenuOptionSelection(selectedStatus);
-
-            // Đóng Navigation Drawer sau khi chọn
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
@@ -99,8 +94,7 @@ public class ManagerOrderActivity extends AppCompatActivity {
         // Thiết lập RecyclerView
         recyclerView = findViewById(R.id.rvOrders);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OrderAdapter(filteredOrders, order -> {
-            // Xử lý khi nhấn "Xem chi tiết"
+        adapter = new OrderAdapter(this, filteredOrders, order -> {
             Intent intent = new Intent(ManagerOrderActivity.this, OrderDetailActivity.class);
             intent.putExtra("orderId", order.getId());
             startActivity(intent);
@@ -113,16 +107,14 @@ public class ManagerOrderActivity extends AppCompatActivity {
         // Xử lý nút tìm kiếm
         btnSearch.setOnClickListener(v -> {
             Toast.makeText(this, "Tính năng tìm kiếm đang được phát triển!", Toast.LENGTH_SHORT).show();
-            // TODO: Thêm logic tìm kiếm
         });
 
         // Xử lý nút thông tin cá nhân
         btnProfile.setOnClickListener(v -> {
             Toast.makeText(this, "Chuyển đến thông tin cá nhân!", Toast.LENGTH_SHORT).show();
-            // TODO: Chuyển đến ProfileActivity
         });
 
-        // Lấy dữ liệu từ Firebase
+        // Lấy dữ liệu đơn hàng từ Firebase
         fetchOrders();
     }
 
@@ -134,18 +126,31 @@ public class ManagerOrderActivity extends AppCompatActivity {
                 orders.clear();
                 filteredOrders.clear();
                 for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
-                    Order order = orderSnapshot.getValue(Order.class);
-                    if (order != null) {
-                        orders.add(order);
-                        filteredOrders.add(order);
+                    try {
+                        Order order = orderSnapshot.getValue(Order.class);
+                        if (order != null) {
+                            orders.add(order);
+                            filteredOrders.add(order);
+                        }
+                    } catch (Exception e) {
+                        Log.e("ManagerOrderActivity", "Error parsing order: " + orderSnapshot.getKey() + ", Error: " + e.getMessage());
                     }
                 }
-                adapter.notifyDataSetChanged();
+                if (orders.isEmpty()) {
+                    Toast.makeText(ManagerOrderActivity.this, "Không có đơn hàng nào!", Toast.LENGTH_SHORT).show();
+                }
+                // Kiểm tra adapter không null trước khi gọi notifyDataSetChanged
+                if (adapter != null) {
+                    adapter.notifyDataSetChanged();
+                } else {
+                    Log.w("ManagerOrderActivity", "Adapter is null, cannot notify data set changed");
+                }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ManagerOrderActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(ManagerOrderActivity.this, "Lỗi khi lấy đơn hàng: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("ManagerOrderActivity", "Error loading orders: " + error.getMessage());
             }
         });
     }
@@ -156,12 +161,14 @@ public class ManagerOrderActivity extends AppCompatActivity {
             filteredOrders.addAll(orders);
         } else {
             for (Order order : orders) {
-                if (order.getStatus().equalsIgnoreCase(status)) {
+                if (order.getStatus() != null && order.getStatus().equalsIgnoreCase(status)) {
                     filteredOrders.add(order);
                 }
             }
         }
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void setupMenuOptions() {
@@ -171,18 +178,14 @@ public class ManagerOrderActivity extends AppCompatActivity {
         optionShipping = findViewById(R.id.optionShipping);
         optionCompleted = findViewById(R.id.optionCompleted);
 
-        // Đặt trạng thái chọn mặc định cho "Tất cả"
         optionAll.setSelected(true);
 
         View.OnClickListener menuOptionClickListener = v -> {
-            // Reset trạng thái chọn
             optionAll.setSelected(false);
             optionConfirm.setSelected(false);
             optionPackaging.setSelected(false);
             optionShipping.setSelected(false);
             optionCompleted.setSelected(false);
-
-            // Đặt trạng thái chọn cho mục được nhấn
             v.setSelected(true);
         };
 
@@ -209,14 +212,12 @@ public class ManagerOrderActivity extends AppCompatActivity {
     }
 
     private void updateMenuOptionSelection(String status) {
-        // Reset trạng thái chọn
         optionAll.setSelected(false);
         optionConfirm.setSelected(false);
         optionPackaging.setSelected(false);
         optionShipping.setSelected(false);
         optionCompleted.setSelected(false);
 
-        // Đặt trạng thái chọn dựa trên status
         switch (status) {
             case "all":
                 optionAll.setSelected(true);
@@ -225,6 +226,9 @@ public class ManagerOrderActivity extends AppCompatActivity {
                 optionConfirm.setSelected(true);
                 break;
             case "processing":
+                optionPackaging.setSelected(true);
+                break;
+            case "Indon_chebien":
                 optionPackaging.setSelected(true);
                 break;
             case "shipping":

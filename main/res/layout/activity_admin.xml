@@ -12,24 +12,26 @@
         android:orientation="vertical">
 
         <!-- Toolbar với nút menu và hình người -->
+
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#FF5722"
+            android:layout_marginTop="20dp"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <!-- Nút menu bên trái -->
-<!--            <ImageButton-->
-<!--                android:id="@+id/btnMenu"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:src="@drawable/ic_menu"-->
-<!--                android:background="?attr/selectableItemBackgroundBorderless"-->
-<!--                android:contentDescription="Menu"-->
-<!--                android:layout_gravity="start"-->
-<!--                android:padding="8dp" />-->
+            <!--            <ImageButton-->
+            <!--                android:id="@+id/btnMenu"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="match_parent"-->
+            <!--                android:src="@drawable/ic_menu"-->
+            <!--                android:background="?attr/selectableItemBackgroundBorderless"-->
+            <!--                android:contentDescription="Menu"-->
+            <!--                android:layout_gravity="start"-->
+            <!--                android:padding="8dp" />-->
 
             <!-- Tiêu đề ở giữa -->
             <TextView
@@ -37,11 +39,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
                 android:text="Quản lý nhà hàng"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:fontFamily="sans-serif-medium" />
+                android:textSize="20sp" />
 
             <!-- Hình người bên phải -->
             <ImageView
@@ -49,9 +51,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
-                android:src="@drawable/ic_person"
                 android:contentDescription="Thông tin cá nhân"
-                android:padding="8dp" />
+                android:padding="8dp"
+                android:src="@drawable/ic_person" />
         </androidx.appcompat.widget.Toolbar>
 
         <ScrollView

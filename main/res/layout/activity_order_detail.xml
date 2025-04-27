@@ -171,7 +171,7 @@
                 android:id="@+id/tvCustomerName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nguyen Van Giao"
+                android:text="Ten KH"
                 android:textSize="14sp"
                 android:textColor="#000000" />
 
@@ -180,7 +180,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="087654321"
+                android:text="SDT"
                 android:textSize="14sp"
                 android:textColor="#000000" />
 
@@ -189,7 +189,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="123 Bùi Đình Tú, Quận 1, TP.HCM"
+                android:text="D/c"
                 android:textSize="14sp"
                 android:textColor="#000000" />
         </LinearLayout>

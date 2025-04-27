@@ -1,12 +1,17 @@
 package com.midterm22.app;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,181 +20,245 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.midterm22.app.OrderItemAdapter;
 import com.midterm22.app.model.Order;
 import com.midterm22.app.model.OrderItem;
 
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
-    private TextView tvOrderId, tvOrderDate, tvTotalAmount, tvTotalAmountFooter, tvCustomerName, tvCustomerPhone, tvCustomerAddress;
+    private TextView tvOrderId, tvOrderDate, tvTotalAmount, tvCustomerName, tvCustomerPhone, tvCustomerAddress, tvTotalAmountFooter;
     private RecyclerView rvOrderItems;
     private Button btnCancelOrder, btnUpdateStatus;
+    private ImageButton btnSearch;
+    private ImageView btnProfile;
     private OrderItemAdapter itemAdapter;
-    private final List<OrderItem> orderItems = new ArrayList<>();
-    private Order currentOrder;
+    private List<OrderItem> orderItems = new ArrayList<>();
+    private String orderId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_detail);
 
-        // Ánh xạ view
+        // Nhận orderId từ Intent
+        Intent intent = getIntent();
+        orderId = intent.getStringExtra("orderId");
+        if (orderId == null) {
+            Toast.makeText(this, "Không tìm thấy đơn hàng!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Thiết lập Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(v -> finish());
+
+        // Ánh xạ các view từ XML
         tvOrderId = findViewById(R.id.tvOrderId);
         tvOrderDate = findViewById(R.id.tvOrderDate);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
-        tvTotalAmountFooter = findViewById(R.id.tvTotalAmountFooter);
         tvCustomerName = findViewById(R.id.tvCustomerName);
         tvCustomerPhone = findViewById(R.id.tvCustomerPhone);
         tvCustomerAddress = findViewById(R.id.tvCustomerAddress);
+        tvTotalAmountFooter = findViewById(R.id.tvTotalAmountFooter);
         rvOrderItems = findViewById(R.id.rvOrderItems);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
         btnUpdateStatus = findViewById(R.id.btnUpdateStatus);
+        btnSearch = findViewById(R.id.btnSearch);
+        btnProfile = findViewById(R.id.btnProfile);
 
-        // Thiết lập RecyclerView cho items
+        // Thiết lập RecyclerView cho danh sách sản phẩm
         rvOrderItems.setLayoutManager(new LinearLayoutManager(this));
-        itemAdapter = new OrderItemAdapter(orderItems);
+        itemAdapter = new OrderItemAdapter(this, orderItems);
         rvOrderItems.setAdapter(itemAdapter);
 
-        // Lấy orderId từ Intent
-        String orderId = getIntent().getStringExtra("orderId");
-        if (orderId != null) {
-            fetchOrderDetails(orderId);
-        }
-
-        // Xử lý nút "Hủy hàng"
-        btnCancelOrder.setOnClickListener(v -> {
-            if (currentOrder != null) {
-                updateOrderStatus("cancelled");
-            }
+        // Xử lý nút tìm kiếm
+        btnSearch.setOnClickListener(v -> {
+            Toast.makeText(this, "Tính năng tìm kiếm đang được phát triển!", Toast.LENGTH_SHORT).show();
         });
 
-        // Xử lý nút "Cập nhật trạng thái"
-        btnUpdateStatus.setOnClickListener(v -> {
-            if (currentOrder != null) {
-                String currentStatus = currentOrder.getStatus().toLowerCase();
-                String newStatus;
-                switch (currentStatus) {
-                    case "pending":
-                        newStatus = "processing";
-                        break;
-                    case "processing":
-                        newStatus = "shipping";
-                        break;
-                    case "shipping":
-                        newStatus = "completed";
-                        break;
-                    default:
-                        Toast.makeText(this, "Đơn hàng đã hoàn thành hoặc bị hủy.", Toast.LENGTH_SHORT).show();
-                        return;
-                }
-                updateOrderStatus(newStatus);
-            }
+        // Xử lý nút thông tin cá nhân
+        btnProfile.setOnClickListener(v -> {
+            Toast.makeText(this, "Chuyển đến thông tin cá nhân!", Toast.LENGTH_SHORT).show();
         });
+
+        // Lấy dữ liệu đơn hàng từ Firebase
+        fetchOrderDetails();
+
+        // Xử lý nút Hủy đơn hàng
+        btnCancelOrder.setOnClickListener(v -> cancelOrder());
+
+        // Xử lý nút Cập nhật trạng thái
+        btnUpdateStatus.setOnClickListener(v -> updateOrderStatus());
     }
 
-    private void fetchOrderDetails(String orderId) {
+    private void fetchOrderDetails() {
         DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
         orderRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                currentOrder = snapshot.getValue(Order.class);
-                if (currentOrder != null) {
-                    // Thông tin đơn hàng
-                    tvOrderId.setText(currentOrder.getId());
-                    tvOrderDate.setText(currentOrder.getCreatedAt());
-                    String totalText = String.format(Locale.getDefault(), "%.0f đ", currentOrder.getTotal());
-                    tvTotalAmount.setText(totalText);
-                    tvTotalAmountFooter.setText(totalText);
+                Order order = snapshot.getValue(Order.class);
+                if (order == null) {
+                    Toast.makeText(OrderDetailActivity.this, "Không tìm thấy đơn hàng!", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
 
-                    // Thông tin khách hàng
-                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(currentOrder.getCustomerId());
-                    userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            String name = snapshot.child("name").getValue(String.class);
-                            String phone = snapshot.child("phone").getValue(String.class);
-                            String address = snapshot.child("address").getValue(String.class);
+                // Hiển thị thông tin đơn hàng
+                tvOrderId.setText(order.getId());
+                tvTotalAmount.setText(formatCurrency(order.getTotal()));
+                tvTotalAmountFooter.setText(formatCurrency(order.getTotal()));
 
-                            tvCustomerName.setText(name != null ? name : "Unknown");
-                            tvCustomerPhone.setText(phone != null ? phone : "N/A");
-                            tvCustomerAddress.setText(address != null ? address : "N/A");
-                        }
+                // Định dạng ngày
+                String createdAt = order.getCreatedAt();
+                String formattedDate = createdAt != null ? createdAt : "N/A";
+                try {
+                    long timestamp = Long.parseLong(createdAt);
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                    formattedDate = sdf.format(new Date(timestamp));
+                } catch (NumberFormatException e) {
+                    Log.w("OrderDetailActivity", "Error formatting date: " + createdAt);
+                }
+                tvOrderDate.setText(formattedDate);
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            tvCustomerName.setText("Unknown");
-                            tvCustomerPhone.setText("N/A");
-                            tvCustomerAddress.setText("N/A");
+                // Lấy thông tin khách hàng
+                fetchCustomerDetails(order.getCustomerId());
+
+                // Lấy danh sách sản phẩm
+                fetchOrderItems();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(OrderDetailActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("OrderDetailActivity", "Error loading order: " + error.getMessage());
+            }
+        });
+    }
+
+    private void fetchCustomerDetails(String customerId) {
+        if (customerId == null || customerId.isEmpty()) {
+            tvCustomerName.setText("Khách hàng không xác định");
+            tvCustomerPhone.setText("N/A");
+            tvCustomerAddress.setText("N/A");
+            return;
+        }
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("User").child(customerId);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String name = snapshot.child("name").getValue(String.class);
+                    String phone = snapshot.child("phone").getValue(String.class);
+                    String address = snapshot.child("address").getValue(String.class);
+                    tvCustomerName.setText(name != null ? name : "N/A");
+                    tvCustomerPhone.setText(phone != null ? phone : "N/A");
+                    tvCustomerAddress.setText(address != null ? address : "N/A");
+                } else {
+                    tvCustomerName.setText("Khách hàng không tồn tại");
+                    tvCustomerPhone.setText("N/A");
+                    tvCustomerAddress.setText("N/A");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                tvCustomerName.setText("Lỗi: " + error.getMessage());
+                tvCustomerPhone.setText("N/A");
+                tvCustomerAddress.setText("N/A");
+                Log.e("OrderDetailActivity", "Error loading customer: " + error.getMessage());
+            }
+        });
+    }
+
+    private void fetchOrderItems() {
+        DatabaseReference itemsRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId).child("items");
+        itemsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                orderItems.clear();
+                for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
+                    OrderItem item = itemSnapshot.getValue(OrderItem.class);
+                    if (item != null) {
+                        orderItems.add(item);
+                    }
+                }
+                itemAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(OrderDetailActivity.this, "Lỗi khi lấy danh sách sản phẩm: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("OrderDetailActivity", "Error loading order items: " + error.getMessage());
+            }
+        });
+    }
+
+    private void cancelOrder() {
+        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
+        orderRef.child("status").setValue("cancelled").addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(OrderDetailActivity.this, "Đơn hàng đã bị hủy!", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(OrderDetailActivity.this, "Lỗi khi hủy đơn hàng!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateOrderStatus() {
+        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
+        orderRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Order order = snapshot.getValue(Order.class);
+                if (order != null) {
+                    String currentStatus = order.getStatus();
+                    String newStatus;
+                    switch (currentStatus) {
+                        case "pending":
+                            newStatus = "In đơn & chế biến";
+                            break;
+                        case "In đơn & chế biến":
+                            newStatus = "Đang giao";
+                            break;
+                        case "Đang giao":
+                            newStatus = "Hoàn thành";
+                            break;
+                        default:
+                            newStatus = currentStatus;
+                            Toast.makeText(OrderDetailActivity.this, "Không thể cập nhật trạng thái!", Toast.LENGTH_SHORT).show();
+                            return;
+                    }
+                    orderRef.child("status").setValue(newStatus).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công!", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(OrderDetailActivity.this, "Lỗi khi cập nhật trạng thái!", Toast.LENGTH_SHORT).show();
                         }
                     });
-
-                    // Danh sách sản phẩm
-                    orderItems.clear();
-                    if (currentOrder.getItems() != null) {
-                        orderItems.addAll(currentOrder.getItems().values());
-                    }
-                       itemAdapter.notifyDataSetChanged();
-
-                    // Cập nhật trạng thái nút dựa trên status
-//                    updateButtonVisibility();
-                } else {
-                    Toast.makeText(OrderDetailActivity.this, "Không tìm thấy đơn hàng.", Toast.LENGTH_SHORT).show();
-                    finish();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(OrderDetailActivity.this, "Lỗi: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                finish();
             }
         });
     }
 
-    private void updateOrderStatus(String newStatus) {
-        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(currentOrder.getId());
-        orderRef.child("status").setValue(newStatus).addOnSuccessListener(aVoid -> {
-            currentOrder.setStatus(newStatus);
-            Toast.makeText(OrderDetailActivity.this, "Cập nhật trạng thái thành công: " + newStatus, Toast.LENGTH_SHORT).show();
-//            updateButtonVisibility();
-        }).addOnFailureListener(e -> {
-            Toast.makeText(OrderDetailActivity.this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
+    private String formatCurrency(double amount) {
+        NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        return format.format(amount);
     }
-
-//    private void updateButtonVisibility() {
-//        if (currentOrder == null) return;
-//
-//        String status = currentOrder.getStatus().toLowerCase();
-//        switch (status) {
-//            case "pending":
-//                btnCancelOrder.setVisibility(View.VISIBLE);
-//                btnUpdateStatus.setVisibility(View.VISIBLE);
-//                btnUpdateStatus.setText("Cập nhật trạng thái");
-//                break;
-//            case "processing":
-//                btnCancelOrder.setVisibility(View.VISIBLE);
-//                btnUpdateStatus.setVisibility(View.VISIBLE);
-//                btnUpdateStatus.setText("Cập nhật trạng thái");
-//                break;
-//            case "shipping":
-//                btnCancelOrder.setVisibility(View.GONE);
-//                btnUpdateStatus.setVisibility(View.VISIBLE);
-//                btnUpdateStatus.setText("Cập nhật trạng thái");
-//                break;
-//            case "completed":
-//            case "cancelled":
-//                btnCancelOrder.setVisibility(View.GONE);
-//                btnUpdateStatus.setVisibility(View.GONE);
-//                break;
-//            default:
-//                btnCancelOrder.setVisibility(View.VISIBLE);
-//                btnUpdateStatus.setVisibility(View.VISIBLE);
-//                break;
-//        }
-//    }
 }
