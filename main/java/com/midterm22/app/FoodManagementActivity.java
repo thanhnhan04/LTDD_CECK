@@ -2,117 +2,202 @@ package com.midterm22.app;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.midterm22.app.AddEditFoodActivity;
+import com.midterm22.app.CustomerManagementActivity;
+import com.midterm22.app.DoanhthuActivity;
+import com.midterm22.app.LoginActivity;
+import com.midterm22.app.ManagerOrderActivity;
+import com.midterm22.app.ProductAdapter;
+import com.midterm22.app.R;
 import com.midterm22.app.model.Product;
+import androidx.appcompat.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FoodManagementActivity extends AppCompatActivity {
 
-    private RecyclerView rvFoods;
+    private RecyclerView rvCurrentFoods, rvHiddenFoods;
     private FloatingActionButton btnAddFood;
-    private ProductAdapter adapter;
-    private List<Product> foodList;
+    private ProductAdapter currentAdapter, hiddenAdapter;
+    private List<Product> currentFoodList, hiddenFoodList;
     private DatabaseReference productRef;
+    private TabLayout tabLayout;
+    private SearchView searchView;
+    private TextView toolbarTitle;
+    private DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_management);
 
-        rvFoods = findViewById(R.id.rvFoods);
+        // Khởi tạo adapter và RecyclerView
+        List<Product> foodList = new ArrayList<>();
+        currentAdapter = new ProductAdapter(this, foodList);
+        hiddenAdapter = new ProductAdapter(this, foodList);
+
+        // Khởi tạo view
+        rvCurrentFoods = findViewById(R.id.rvCurrentFoods);
+        rvHiddenFoods = findViewById(R.id.rvHiddenFoods);
         btnAddFood = findViewById(R.id.btnAddFood);
-        rvFoods.setLayoutManager(new LinearLayoutManager(this));
+        tabLayout = findViewById(R.id.tabLayout);
+        searchView = findViewById(R.id.searchView);
+        toolbarTitle = findViewById(R.id.toolbar_title);
+        drawerLayout = findViewById(R.id.drawerLayout);
+
+        // Toolbar setup
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        foodList = new ArrayList<>();
-        adapter = new ProductAdapter(this, foodList);
-        rvFoods.setAdapter(adapter);
+        // DrawerLayout setup
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
 
-        // Firebase
+        // NavigationView setup
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            // Handling menu item clicks
+            if (id == R.id.nav_home) {
+                // Already on the homepage, do nothing
+            } else if (id == R.id.nav_qldh) {
+                startActivity(new Intent(this, ManagerOrderActivity.class));
+            } else if (id == R.id.nav_qlsp) {
+                startActivity(new Intent(this, FoodManagementActivity.class));
+            } else if (id == R.id.nav_qlkh) {
+                startActivity(new Intent(this, CustomerManagementActivity.class));
+            } else if (id == R.id.nav_qldt) {
+                startActivity(new Intent(this, DoanhthuActivity.class));
+            } else if (id == R.id.nav_logout) {
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();  // Close current activity to prevent going back
+            }
+
+            drawerLayout.closeDrawers(); // Close the drawer after an item is selected
+            return true;
+        });
+
+        // Tab setup
+        tabLayout.addTab(tabLayout.newTab().setText("Món ăn hiện tại"));
+        tabLayout.addTab(tabLayout.newTab().setText("Món ăn đã ẩn"));
+
+        // Set mặc định: hiển thị rvCurrentFoods
+        rvCurrentFoods.setVisibility(View.VISIBLE);
+        rvHiddenFoods.setVisibility(View.GONE);
+
+        // Chọn tab đầu tiên
+        TabLayout.Tab defaultTab = tabLayout.getTabAt(0);
+        if (defaultTab != null) {
+            defaultTab.select();
+        }
+
+        // Initialize food lists
+        currentFoodList = new ArrayList<>();
+        hiddenFoodList = new ArrayList<>();
+
+        rvCurrentFoods.setLayoutManager(new LinearLayoutManager(this));
+        rvHiddenFoods.setLayoutManager(new LinearLayoutManager(this));
+
+        rvCurrentFoods.setAdapter(currentAdapter);
+        rvHiddenFoods.setAdapter(hiddenAdapter);
+
+        // Search functionality
+        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterFoods(newText);
+                toolbarTitle.setVisibility(View.VISIBLE);
+                return true;
+            }
+        });
+
+        // Firebase setup
         productRef = FirebaseDatabase.getInstance().getReference("products");
+        loadFoods();
 
-        loadFoods(); // Load dữ liệu sản phẩm từ Firebase
-
-        // Sự kiện nút thêm món ăn
+        // Add food button click
         btnAddFood.setOnClickListener(v -> {
             startActivity(new Intent(this, AddEditFoodActivity.class));
         });
 
-        // Xử lý khi click vào một món ăn để sửa
-        adapter.setOnFoodActionListener(new ProductAdapter.OnFoodActionListener() {
+        // Tab selection listener
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onEdit(Product product) {
-                Intent intent = new Intent(FoodManagementActivity.this, AddEditFoodActivity.class);
-                intent.putExtra("productId", product.getId()); // Key phải khớp với AddEditFoodActivity
-                startActivity(intent);
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    rvCurrentFoods.setVisibility(View.VISIBLE);
+                    rvHiddenFoods.setVisibility(View.GONE);
+                } else {
+                    rvCurrentFoods.setVisibility(View.GONE);
+                    rvHiddenFoods.setVisibility(View.VISIBLE);
+                }
             }
+
             @Override
-            public void onHide(Product product) {
-                // Cập nhật Firebase để ẩn món ăn
-                DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(product.getId());
-                productRef.child("available").setValue(false);
-            }
+            public void onTabUnselected(TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
+        // Adapter actions setup
+        setupAdapterActions();
     }
 
-    // Xử lý chỉnh sửa món ăn
-    public void onEdit(Product product) {
-        Log.d("DEBUG_EDIT", "Đã nhấn nút sửa sản phẩm: " + product.getName());
-        Intent intent = new Intent(FoodManagementActivity.this, AddEditFoodActivity.class);
-        intent.putExtra("id", product.getId());
-        intent.putExtra("name", product.getName());
-        intent.putExtra("description", product.getDescription());
-        intent.putExtra("price", product.getPrice());
-        intent.putExtra("imageUrl", product.getImageUrl());
-        startActivity(intent);
-    }
-
-    // Cập nhật trạng thái ẩn hiện của món ăn
-    private void updateAvailability(Product product, boolean isAvailable) {
-        DatabaseReference productRef = FirebaseDatabase.getInstance().getReference("products").child(product.getId());
-        productRef.child("isAvailable").setValue(isAvailable)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(FoodManagementActivity.this, isAvailable ? "Món ăn đã được hiển thị!" : "Món ăn đã bị ẩn!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(FoodManagementActivity.this, "Lỗi cập nhật: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    // Tải danh sách món ăn từ Firebase
     private void loadFoods() {
         productRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                foodList.clear();
+                currentFoodList.clear();
+                hiddenFoodList.clear();
+
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Product product = data.getValue(Product.class);
                     if (product != null) {
                         product.setId(data.getKey());
-                        foodList.add(product);
+                        if (product.isAvailable()) {
+                            currentFoodList.add(product);
+                        } else {
+                            hiddenFoodList.add(product);
+                        }
                     }
                 }
-                adapter.notifyDataSetChanged();
+
+                // Update the adapter's list
+                currentAdapter.setProductList(currentFoodList);
+                hiddenAdapter.setProductList(hiddenFoodList);
             }
 
             @Override
@@ -120,5 +205,39 @@ public class FoodManagementActivity extends AppCompatActivity {
                 Toast.makeText(FoodManagementActivity.this, "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void filterFoods(String query) {
+        currentAdapter.filterList(query);
+        hiddenAdapter.filterList(query);
+    }
+
+    private void setupAdapterActions() {
+        ProductAdapter.OnFoodActionListener actionListener = new ProductAdapter.OnFoodActionListener() {
+            @Override
+            public void onEdit(Product product) {
+                Intent intent = new Intent(FoodManagementActivity.this, AddEditFoodActivity.class);
+                intent.putExtra("productId", product.getId());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onHide(Product product) {
+                boolean newAvailable = !product.isAvailable();
+                productRef.child(product.getId())
+                        .child("available")
+                        .setValue(newAvailable)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(FoodManagementActivity.this,
+                                    newAvailable ? "Đã hiện lại món ăn" : "Đã ẩn món ăn",
+                                    Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(FoodManagementActivity.this, "Lỗi, vui lòng thử lại", Toast.LENGTH_SHORT).show();
+                        });
+            }
+        };
+        currentAdapter.setOnFoodActionListener(actionListener);
+        hiddenAdapter.setOnFoodActionListener(actionListener);
     }
 }

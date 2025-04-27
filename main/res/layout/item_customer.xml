@@ -23,7 +23,7 @@
             android:layout_marginEnd="12dp"
             android:contentDescription="Avatar"
             android:scaleType="centerCrop"
-         />
+            />
 
         <!-- Info Column -->
         <LinearLayout
