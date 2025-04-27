@@ -1,47 +1,26 @@
 package com.midterm22.app.model;
 
-
 public class OrderItem {
-    private String productId;
     private String productName;
-    private int quantity;
     private double unitPrice;
-    private double totalPrice;
+    private int quantity;
+    private Order order; // Thêm trường để liên kết với Order
 
-    public OrderItem() {
-    }
-
-    public OrderItem(String productId, String productName, int quantity, double unitPrice, double totalPrice) {
-        this.productId = productId;
+    // Constructor
+    public OrderItem(String productName, double unitPrice, int quantity, Order order) {
         this.productName = productName;
-        this.quantity = quantity;
         this.unitPrice = unitPrice;
-        this.totalPrice = totalPrice;
+        this.quantity = quantity;
+        this.order = order;
     }
 
-    // Getter and Setter methods
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
+    // Getter và Setter
     public String getProductName() {
         return productName;
     }
 
     public void setProductName(String productName) {
         this.productName = productName;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public double getUnitPrice() {
@@ -52,11 +31,19 @@ public class OrderItem {
         this.unitPrice = unitPrice;
     }
 
-    public double getTotalPrice() {
-        return totalPrice;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setTotalPrice(double totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }

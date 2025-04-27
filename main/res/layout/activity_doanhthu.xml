@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Tiêu đề -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thống Kê Doanh Thu"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/gradient_background"
+            android:padding="12dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Tổng quan -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card:cardCornerRadius="12dp"
+            card:cardElevation="8dp"
+            card:cardBackgroundColor="#FFFFFF"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <!-- Tổng đơn hàng -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tổng đơn hàng"
+                        android:textSize="14sp"
+                        android:textColor="#666666"/>
+                    <TextView
+                        android:id="@+id/total_orders"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FF5722"/>
+                </LinearLayout>
+
+                <!-- Tổng doanh thu -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tổng doanh thu"
+                        android:textSize="14sp"
+                        android:textColor="#666666"/>
+                    <TextView
+                        android:id="@+id/total_revenue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FF5722"/>
+                </LinearLayout>
+
+                <!-- Giá trị trung bình đơn hàng -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Giá trị TB đơn hàng"
+                        android:textSize="14sp"
+                        android:textColor="#666666"/>
+                    <TextView
+                        android:id="@+id/avg_order_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#FF5722"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Biểu đồ doanh thu -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card:cardCornerRadius="12dp"
+            card:cardElevation="8dp"
+            card:cardBackgroundColor="#FFFFFF"
+            android:layout_marginBottom="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Biểu đồ doanh thu"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+                                <com.github.mikephil.charting.charts.BarChart
+                                    android:id="@+id/bar_chart"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="200dp"/>
+                <Button
+                    android:id="@+id/btnPreviousWeek"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xem tuần trước"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Biểu đồ giờ cao điểm -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card:cardCornerRadius="12dp"
+            card:cardElevation="8dp"
+            card:cardBackgroundColor="#FFFFFF"
+            android:layout_marginBottom="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Giờ cao điểm"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#333333"/>
+                                <com.github.mikephil.charting.charts.HorizontalBarChart
+                                    android:id="@+id/horizontal_bar_chart"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="150dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Danh sách món ăn phổ biến -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Món ăn phổ biến"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:padding="8dp"/>
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            card:cardCornerRadius="12dp"
+            card:cardElevation="8dp"
+            card:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Món 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Burger bò"
+                        android:textSize="14sp"
+                        android:textColor="#333333"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="520"
+                        android:textSize="14sp"
+                        android:textColor="#333333"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="78,000,000 đ"
+                        android:textSize="14sp"
+                        android:textColor="#333333"
+                        android:paddingStart="8dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+15.2%"
+                        android:textSize="14sp"
+                        android:textColor="#4CAF50"
+                        android:paddingStart="8dp"/>
+                </LinearLayout>
+
+                <!-- Món 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Burger gà"
+                        android:textSize="14sp"
+                        android:textColor="#333333"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="480"
+                        android:textSize="14sp"
+                        android:textColor="#333333"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="48,000,000 đ"
+                        android:textSize="14sp"
+                        android:textColor="#333333"
+                        android:paddingStart="8dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+8.7%"
+                        android:textSize="14sp"
+                        android:textColor="#4CAF50"
+                        android:paddingStart="8dp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+</ScrollView>

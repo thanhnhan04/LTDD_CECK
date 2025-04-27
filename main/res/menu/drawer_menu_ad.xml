@@ -1,0 +1,44 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<menu xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--&lt;!&ndash;    <item&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/nav_all"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:title="Tất cả" />&ndash;&gt;-->
+<!--&lt;!&ndash;    <item&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/nav_confirm"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:title="Xác nhận" />&ndash;&gt;-->
+<!--&lt;!&ndash;    <item&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/nav_packaging"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:title="In và đóng gói" />&ndash;&gt;-->
+<!--&lt;!&ndash;    <item&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/nav_shipping"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:title="Đang vận chuyển" />&ndash;&gt;-->
+<!--&lt;!&ndash;    <item&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/nav_completed"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:title="Hoàn thành" />&ndash;&gt;-->
+<!--</menu>-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item
+    android:id="@+id/nav_home"
+    android:title="Trang chính"
+    android:icon="@drawable/ic_home" />
+<item
+    android:id="@+id/nav_qlsp"
+    android:title="Quản lý sản phẩm"
+    android:icon="@drawable/ic_qlsp"/>
+<item
+    android:id="@+id/nav_qlkh"
+    android:title="Quản lý khách hàng"
+    android:icon="@drawable/ic_qlkh"/>
+<item
+    android:id="@+id/nav_qldh"
+    android:title="Quản lý đơn hàng"
+    android:icon="@drawable/ic_qldh"/>
+<item
+    android:id="@+id/nav_qldt"
+    android:title="Quản lý doanh thu"
+    android:icon="@drawable/ic_qldt"/>
+<item
+    android:id="@+id/nav_logout"
+    android:title="Đăng xuất"
+    android:icon="@drawable/ic_logout" />
+</menu>
