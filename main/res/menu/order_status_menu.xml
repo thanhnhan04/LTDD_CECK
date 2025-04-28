@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_confirm"
+        android:title="Xác nhận đơn hàng"/>
+    <item
+        android:id="@+id/action_print"
+        android:title="In đơn hàng"/>
+    <item
+        android:id="@+id/action_pack"
+        android:title="Đóng gói"/>
+    <item
+        android:id="@+id/action_ship"
+        android:title="Giao hàng"/>
+    <item
+        android:id="@+id/action_complete"
+        android:title="Hoàn thành"/>
+</menu>

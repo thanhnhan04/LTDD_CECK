@@ -114,7 +114,7 @@ public class PaymentActivity extends AppCompatActivity {
             order.setId(orderId);
             order.setCustomerId(customerId);
             order.setTotal(finalTotal);
-            order.setStatus("pending");
+            order.setStatus("Pending");
             order.setCreatedAt(String.valueOf(System.currentTimeMillis()));
             order.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
 

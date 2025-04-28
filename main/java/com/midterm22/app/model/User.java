@@ -10,7 +10,7 @@ public class User {
     private String role; // "admin" or "customer"
     private String createdAt;
     private String updatedAt;
-
+    private boolean active = true; // Mặc định đang hoạt động
     public User() {
     }
 
@@ -25,6 +25,14 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
     // Getter and Setter methods
     public String getId() {
         return id;

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Style dùng để chỉnh kích thước chữ trong Navigation Drawer -->
+    <style name="DrawerMenuTextStyle" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">18sp</item> <!-- Bạn có thể tăng lên 20sp nếu muốn to hơn nữa -->
+        <item name="android:textStyle">bold</item> <!-- Tùy chọn, nếu bạn muốn in đậm -->
+    </style>
+    <style name="ToolbarTitleStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+
+
+    <style name="TabLayoutTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+    <style name="CircleImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+</resources>
