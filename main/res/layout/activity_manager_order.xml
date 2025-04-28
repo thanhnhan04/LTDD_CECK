@@ -14,6 +14,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
             android:elevation="4dp"
@@ -34,17 +35,18 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <!-- Nút tìm kiếm -->
-                <ImageButton
-                    android:id="@+id/btnSearch"
+                <!-- SearchView -->
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/searchView"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="42dp"
+                    android:layout_toStartOf="@id/btnProfile"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Search"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_search" />
+                    android:iconifiedByDefault="false"
+                    android:queryHint="Tìm kiếm đơn hàng..."
+                    app:searchIcon="@drawable/ic_search" />
 
                 <!-- Nút thông tin cá nhân -->
                 <ImageView
@@ -176,4 +178,5 @@
         android:fitsSystemWindows="true"
         app:menu="@menu/drawer_menu"
         app:itemTextAppearance="@style/DrawerMenuTextStyle" />
+
 </androidx.drawerlayout.widget.DrawerLayout>

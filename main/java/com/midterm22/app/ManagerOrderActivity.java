@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -39,7 +39,7 @@ public class ManagerOrderActivity extends AppCompatActivity {
     private OrderAdminAdapter adapter;
     private final List<Order> orders = new ArrayList<>();
     private final List<Order> filteredOrders = new ArrayList<>();
-    private ImageButton btnSearch;
+    private SearchView searchView; // Thay ImageButton bằng SearchView
     private ImageView btnProfile;
     private TextView optionAll, optionPending, optionConfirm, optionShipping, optionCompleted, optionCancelled;
     private FirebaseAuth mAuth;
@@ -76,20 +76,35 @@ public class ManagerOrderActivity extends AppCompatActivity {
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(item -> {
-            String selectedStatus = "all";
-            switch (item.getItemId()) {
-                default:
-                    Toast.makeText(this, "Chức năng chưa được hỗ trợ!", Toast.LENGTH_SHORT).show();
-                    break;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                Intent intent = new Intent(this, AdminActivity.class);
+                startActivity(intent);
+            } else if (itemId == R.id.nav_qlkh) {
+                Intent intent = new Intent(ManagerOrderActivity.this, CustomerManagementActivity.class);
+                startActivity(intent);
+            } else if (itemId == R.id.nav_qldh) {
+                Toast.makeText(this, "Bạn đang ở Quản lý đơn hàng", Toast.LENGTH_SHORT).show();
+            } else if (itemId == R.id.nav_qlsp) {
+                Intent intent = new Intent(ManagerOrderActivity.this, FoodManagementActivity.class);
+                startActivity(intent);
+            } else if (itemId == R.id.nav_qldt) {
+                Intent intent = new Intent(ManagerOrderActivity.this, DoanhthuActivity.class);
+                startActivity(intent);
+            } else if (itemId == R.id.nav_logout) {
+                mAuth.signOut();
+                Intent intent = new Intent(ManagerOrderActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "Chức năng chưa được hỗ trợ!", Toast.LENGTH_SHORT).show();
             }
-            filterOrders(selectedStatus);
-            updateMenuOptionSelection(selectedStatus);
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
 
         // Ánh xạ các nút trên Toolbar
-        btnSearch = findViewById(R.id.btnSearch);
+        searchView = findViewById(R.id.searchView); // Ánh xạ SearchView
         btnProfile = findViewById(R.id.btnProfile);
 
         // Thiết lập RecyclerView
@@ -102,26 +117,92 @@ public class ManagerOrderActivity extends AppCompatActivity {
         });
         recyclerView.setAdapter(adapter);
 
-        // Thiết lập menu options
         setupMenuOptions();
+        setupSearchView();
 
-        // Xử lý nút tìm kiếm
-        btnSearch.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng tìm kiếm đang được phát triển!", Toast.LENGTH_SHORT).show();
-        });
-
-        // Xử lý nút thông tin cá nhân
         btnProfile.setOnClickListener(v -> {
-            Toast.makeText(this, "Chuyển đến thông tin cá nhân!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ManagerOrderActivity.this, hosoadmin.class);
+            startActivity(intent);
+        });
+        fetchOrders();
+    }
+
+    private void setupSearchView() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Không cần xử lý khi nhấn Enter
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filterOrdersBySearch(newText);
+                return true;
+            }
         });
 
-        // Lấy dữ liệu đơn hàng từ Firebase
-        fetchOrders();
+        searchView.setOnCloseListener(() -> {
+            filterOrdersBySearch("");
+            return false;
+        });
+    }
+
+    private void filterOrdersBySearch(String query) {
+        filteredOrders.clear();
+        String currentStatus = getCurrentStatus();
+
+        if (query.trim().isEmpty()) {
+            if (currentStatus.equals("all")) {
+                filteredOrders.addAll(orders);
+            } else {
+                for (Order order : orders) {
+                    if (order.getStatus() != null && order.getStatus().equals(currentStatus)) {
+                        filteredOrders.add(order);
+                    }
+                }
+            }
+        } else {
+            String lowerQuery = query.toLowerCase();
+            for (Order order : orders) {
+                boolean matchesQuery = false;
+                // Tìm theo ID đơn hàng
+                if (order.getId() != null && order.getId().toLowerCase().contains(lowerQuery)) {
+                    matchesQuery = true;
+                }
+//                // Tìm theo tên khách hàng (giả định Order có trường customerName)
+//                if (order.getCustomerName() != null && order.getCustomerName().toLowerCase().contains(lowerQuery)) {
+//                    matchesQuery = true;
+//                }
+//                // Tìm theo số điện thoại (giả định Order có trường phoneNumber)
+//                if (order.getPhoneNumber() != null && order.getPhoneNumber().toLowerCase().contains(lowerQuery)) {
+//                    matchesQuery = true;
+//                }
+
+                if (matchesQuery && (currentStatus.equals("all") || (order.getStatus() != null && order.getStatus().equals(currentStatus)))) {
+                    filteredOrders.add(order);
+                }
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+        if (filteredOrders.isEmpty()) {
+            Toast.makeText(ManagerOrderActivity.this, "Không tìm thấy đơn hàng!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getCurrentStatus() {
+        if (optionAll.isSelected()) return "all";
+        if (optionPending.isSelected()) return "Pending";
+        if (optionConfirm.isSelected()) return "Confirm";
+        if (optionShipping.isSelected()) return "Shipping";
+        if (optionCompleted.isSelected()) return "Complete";
+        if (optionCancelled.isSelected()) return "Cancelled";
+        return "all"; // Mặc định
     }
 
     private void fetchOrders() {
         DatabaseReference ordersRef = FirebaseDatabase.getInstance().getReference("orders");
-        // Sắp xếp theo child "createdAt" (giả sử bạn có trường này) và giới hạn 100 đơn hàng
         Query query = ordersRef.orderByChild("createdAt").limitToLast(100);
 
         query.addValueEventListener(new ValueEventListener() {
@@ -130,23 +211,21 @@ public class ManagerOrderActivity extends AppCompatActivity {
                 orders.clear();
                 filteredOrders.clear();
 
-                // Đảo ngược thứ tự bằng cách lặp từ cuối lên đầu
                 List<DataSnapshot> snapshots = new ArrayList<>();
                 for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
                     snapshots.add(orderSnapshot);
                 }
 
-                // Lặp ngược để đảo thứ tự
                 for (int i = snapshots.size() - 1; i >= 0; i--) {
                     DataSnapshot orderSnapshot = snapshots.get(i);
                     try {
                         Order order = orderSnapshot.getValue(Order.class);
                         if (order != null) {
-                            // Đặt trạng thái mặc định là "Đang chờ" nếu status là null
                             if (order.getStatus() == null) {
                                 order.setStatus("Pending");
                                 ordersRef.child(orderSnapshot.getKey()).child("status").setValue("Pending");
                             }
+                            order.setId(orderSnapshot.getKey()); // Đảm bảo ID được gán
                             orders.add(order);
                             filteredOrders.add(order);
                         }

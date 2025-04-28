@@ -31,7 +31,7 @@ public class AdminActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
-        btnProfile = findViewById(R.id.btnProfile); // Thêm dòng này để ánh xạ btnProfile
+        btnProfile = findViewById(R.id.btnProfile);
 
         cardCustomers = findViewById(R.id.cardCustomers);
         cardOrders = findViewById(R.id.cardOrders);
@@ -110,7 +110,6 @@ public class AdminActivity extends AppCompatActivity {
     }
 
     private void loadStatistics() {
-        // TODO: Thay thế bằng dữ liệu thực từ Firebase hoặc API
         tvCustomerCount.setText("125 khách hàng");
         tvOrderCount.setText("42 đơn hàng");
         tvFoodCount.setText("35 món ăn");
