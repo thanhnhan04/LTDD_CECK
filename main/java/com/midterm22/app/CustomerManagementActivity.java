@@ -40,78 +40,67 @@ public class CustomerManagementActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_management);
 
-        // Khởi tạo DrawerLayout và NavigationView
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
 
-        // Khởi tạo RecyclerViews
         rvActiveCustomers = findViewById(R.id.rvActiveCustomers);
         rvLockedCustomers = findViewById(R.id.rvLockedCustomers);
 
         rvActiveCustomers.setLayoutManager(new LinearLayoutManager(this));
         rvLockedCustomers.setLayoutManager(new LinearLayoutManager(this));
 
-        // Khởi tạo Adapter
         activeAdapter = new CustomerAdapter(this);
         lockedAdapter = new CustomerAdapter(this);
 
         rvActiveCustomers.setAdapter(activeAdapter);
         rvLockedCustomers.setAdapter(lockedAdapter);
 
-        // Khởi tạo danh sách
         activeCustomerList = new ArrayList<>();
         inactiveCustomerList = new ArrayList<>();
 
-        // Khởi tạo TabLayout
         tabLayout = findViewById(R.id.tabLayout);
 
-        // Thêm 2 tab
         tabLayout.addTab(tabLayout.newTab().setText("Tài khoản hiện tại"));
         tabLayout.addTab(tabLayout.newTab().setText("Tài khoản bị khóa"));
 
-        // Xử lý sự kiện chọn tab
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 0) { // Tab "Tài khoản hiện tại"
+                if (tab.getPosition() == 0) {
                     rvActiveCustomers.setVisibility(View.VISIBLE);
                     rvLockedCustomers.setVisibility(View.GONE);
-                } else { // Tab "Tài khoản bị khóa"
+                    activeAdapter.setCustomers(activeCustomerList, true);  // Active list
+                } else {
                     rvActiveCustomers.setVisibility(View.GONE);
                     rvLockedCustomers.setVisibility(View.VISIBLE);
+                    lockedAdapter.setCustomers(inactiveCustomerList, false);  // Locked list
                 }
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {}
-
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
 
-        // Thiết lập Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(""); // Ẩn tiêu đề mặc định
+        getSupportActionBar().setTitle("");
 
-        // Xử lý hamburger menu
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        // Xử lý chọn item menu
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
-                // Đã ở trang chủ
             } else if (id == R.id.nav_qldh) {
                 startActivity(new Intent(this, ManagerOrderActivity.class));
             } else if (id == R.id.nav_qlsp) {
                 startActivity(new Intent(this, FoodManagementActivity.class));
             } else if (id == R.id.nav_qlkh) {
-                // Đã ở CustomerManagementActivity
             } else if (id == R.id.nav_qldt) {
                 startActivity(new Intent(this, DoanhthuActivity.class));
             } else if (id == R.id.nav_logout) {
@@ -122,20 +111,24 @@ public class CustomerManagementActivity extends AppCompatActivity {
             return true;
         });
 
-        // Firebase Database
         usersRef = FirebaseDatabase.getInstance().getReference("User");
         loadCustomers();
 
-        // Sự kiện click vào item RecyclerView
         activeAdapter.setOnItemClickListener(user -> {
             Intent intent = new Intent(this, CustomerDetailActivity.class);
             intent.putExtra("userId", user.getId());
             startActivity(intent);
         });
+        lockedAdapter.setOnItemClickListener(user -> {
+            Intent intent = new Intent(this, CustomerDetailActivity.class);
+            intent.putExtra("userId", user.getId());
+            startActivity(intent);
+        });
+
     }
 
     private void loadCustomers() {
-        usersRef.orderByChild("role").equalTo("customer").addValueEventListener(new ValueEventListener() {
+        usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 activeCustomerList.clear();
@@ -144,23 +137,21 @@ public class CustomerManagementActivity extends AppCompatActivity {
                     User user = data.getValue(User.class);
                     if (user != null) {
                         user.setId(data.getKey());
-                        Log.d("CustomerRole", "User role: " + user.getRole());  // Kiểm tra role
-                        if (user.getRole().equals("locked")) {
-                            inactiveCustomerList.add(user);  // Người bị khóa
-                        } else {
-                            activeCustomerList.add(user);  // Người đang hoạt động
+                        Log.d("CustomerRole", "User role: " + user.getRole());
+
+                        if ("customer".equals(user.getRole())) {
+                            activeCustomerList.add(user);
+                        } else if ("locked".equals(user.getRole())) {
+                            inactiveCustomerList.add(user);
                         }
                     }
                 }
                 Log.d("CustomerData", "Active users: " + activeCustomerList.size());
                 Log.d("CustomerData", "Locked users: " + inactiveCustomerList.size());
 
-                // Cập nhật adapter cho các RecyclerView
-                activeAdapter.setActiveCustomers(activeCustomerList);
-                activeAdapter.notifyDataSetChanged();  // Cập nhật dữ liệu cho active customers
-
-                lockedAdapter.setInactiveCustomers(inactiveCustomerList);
-                lockedAdapter.notifyDataSetChanged();  // Cập nhật dữ liệu cho locked customers
+                // Sửa lại nè:
+                activeAdapter.setCustomers(activeCustomerList, true);
+                lockedAdapter.setCustomers(inactiveCustomerList, false);
             }
 
             @Override
@@ -169,4 +160,5 @@ public class CustomerManagementActivity extends AppCompatActivity {
             }
         });
     }
+
 }

@@ -19,38 +19,28 @@ import java.util.List;
 public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.CustomerViewHolder> {
 
     private Context context;
-    private List<User> activeCustomerList;
-    private List<User> inactiveCustomerList;
+    private List<User> customerList;
     private OnItemClickListener listener;
 
     // Màu sắc cho trạng thái
-    private static final int ACTIVE_COLOR = 0xFF4CAF50; // Màu xanh cho trạng thái "Đang hoạt động"
-    private static final int INACTIVE_COLOR = 0xFFF44336; // Màu đỏ cho trạng thái "Đã khóa"
+    private static final int ACTIVE_COLOR = 0xFF4CAF50;  // Xanh
+    private static final int INACTIVE_COLOR = 0xFFF44336;  // Đỏ
 
     public interface OnItemClickListener {
-        void onDetailsClick(User user);  // Single method for handling the details click
+        void onDetailsClick(User user);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
-    // Constructor for the adapter with initial active and inactive customer lists
     public CustomerAdapter(Context context) {
         this.context = context;
-        this.activeCustomerList = new ArrayList<>();
-        this.inactiveCustomerList = new ArrayList<>();
+        this.customerList = new ArrayList<>();
     }
 
-    // Method to update the active customer list
-    public void setActiveCustomers(List<User> customers) {
-        this.activeCustomerList = customers;
-        notifyDataSetChanged();
-    }
-
-    // Method to update the inactive customer list
-    public void setInactiveCustomers(List<User> customers) {
-        this.inactiveCustomerList = customers;
+    public void setCustomers(List<User> customers, boolean isActiveList) {
+        this.customerList = customers;
         notifyDataSetChanged();
     }
 
@@ -63,42 +53,30 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
 
     @Override
     public void onBindViewHolder(@NonNull CustomerViewHolder holder, int position) {
-        // Determine which list (active or inactive) is being displayed
-        User user = activeCustomerList.size() > 0 ? activeCustomerList.get(position) : inactiveCustomerList.get(position);
+        User user = customerList.get(position);
 
-        // Set user details
         holder.tvName.setText(user.getName());
         holder.tvEmail.setText("Email: " + user.getEmail());
+        holder.imgAvatar.setImageResource(R.drawable.user);
 
-        // Thay đổi điều kiện kiểm tra trạng thái
         if ("locked".equals(user.getRole())) {
             holder.tvStatus.setText("Trạng thái: Đã khóa");
-            holder.tvStatus.setTextColor(INACTIVE_COLOR); // Màu đỏ cho trạng thái bị khóa
+            holder.tvStatus.setTextColor(INACTIVE_COLOR);
         } else {
             holder.tvStatus.setText("Trạng thái: Đang hoạt động");
-            holder.tvStatus.setTextColor(ACTIVE_COLOR); // Màu xanh cho trạng thái đang hoạt động
+            holder.tvStatus.setTextColor(ACTIVE_COLOR);
         }
 
-        // Set default avatar image
-        holder.imgAvatar.setImageResource(R.drawable.user); // Default image
-
-        // Handle click on details button
         holder.btnDetails.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onDetailsClick(user);  // Use the method from listener
+                listener.onDetailsClick(user);
             }
         });
     }
 
-
     @Override
     public int getItemCount() {
-        // Return the total number of items in the active or inactive list based on the displayed category
-        if (!activeCustomerList.isEmpty()) {
-            return activeCustomerList.size();
-        } else {
-            return inactiveCustomerList.size();
-        }
+        return customerList != null ? customerList.size() : 0;
     }
 
     public static class CustomerViewHolder extends RecyclerView.ViewHolder {
