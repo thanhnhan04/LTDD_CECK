@@ -1,15 +1,24 @@
 package com.midterm22.app;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import android.util.Log;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.util.Log;
+import android.widget.Toast;
+
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,7 +37,9 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DoanhthuActivity extends AppCompatActivity {
-
+    private ImageButton btnSearch;
+    private ImageView btnProfile;
+    private DrawerLayout drawerLayout;
     private TextView monthlyOrders, monthlyRevenue, dailyOrders, dailyRevenue;
     private BarChart barChart;
     private Button btnToggleChart;
@@ -40,8 +51,7 @@ public class DoanhthuActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doanhthu);
-
-        // Ánh xạ các thành phần giao diện
+        drawerLayout = findViewById(R.id.drawer_layout);
         monthlyOrders = findViewById(R.id.monthly_orders);
         monthlyRevenue = findViewById(R.id.monthly_revenue);
         dailyOrders = findViewById(R.id.daily_orders);
@@ -58,7 +68,48 @@ public class DoanhthuActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         DatabaseReference ordersRef = databaseReference.child("orders");
 
-        // Xử lý nút toggle biểu đồ
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, AdminActivity.class));
+            } else if (id == R.id.nav_qldh) {
+                startActivity(new Intent(this, ManagerOrderActivity.class));
+            } else if (id == R.id.nav_qlsp) {
+                startActivity(new Intent(this, FoodManagementActivity.class));
+            } else if (id == R.id.nav_qlkh) {
+                startActivity(new Intent(this, CustomerManagementActivity.class));
+            } else if (id == R.id.nav_qldt) {
+                startActivity(new Intent(this, DoanhthuActivity.class));
+            } else if (id == R.id.nav_logout) {
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            }
+
+            drawerLayout.closeDrawers();
+            return true;
+        });
+        btnSearch = findViewById(R.id.btnSearch);
+        btnProfile = findViewById(R.id.btnProfile);
+        btnSearch.setOnClickListener(v -> {
+            Toast.makeText(this, "Tính năng tìm kiếm đang được phát triển!", Toast.LENGTH_SHORT).show();
+        });
+
+        btnProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(this,hosoadmin.class); // Thay ProfileActivity bằng activity của bạn
+            startActivity(intent);
+        });
+
         btnToggleChart.setOnClickListener(v -> {
             if (barChart.getVisibility() == View.GONE) {
                 barChart.setVisibility(View.VISIBLE);
@@ -87,14 +138,12 @@ public class DoanhthuActivity extends AppCompatActivity {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String currentDate = dateFormat.format(new Date());
 
-                // Nếu không có dữ liệu
                 if (!dataSnapshot.exists()) {
                     Log.d("Firebase", "Không tìm thấy node 'orders'");
                     updateUI(monthlyOrdersCount, monthlyRevenueValue, dailyOrdersCount, dailyRevenueValue, peakHourCounts, ordersList);
                     return;
                 }
 
-                // Duyệt qua từng đơn hàng
                 for (DataSnapshot orderSnap : dataSnapshot.getChildren()) {
                     Double orderPrice = orderSnap.child("total").getValue(Double.class);
                     String createdAt = orderSnap.child("createdAt").getValue(String.class);
@@ -112,7 +161,6 @@ public class DoanhthuActivity extends AppCompatActivity {
                         status = "Không xác định";
                     }
 
-                    // Phân tích thời gian đơn hàng
                     try {
                         long timestamp = Long.parseLong(createdAt);
                         Date orderDate = new Date(timestamp);
@@ -123,7 +171,6 @@ public class DoanhthuActivity extends AppCompatActivity {
                         int orderHour = orderCalendar.get(Calendar.HOUR_OF_DAY);
                         String orderDateStr = dateFormat.format(orderDate);
 
-                        // Thêm vào danh sách đơn hàng
                         Order order = new Order(orderId, timestamp, orderPrice, status);
                         ordersList.add(order);
 
@@ -154,7 +201,6 @@ public class DoanhthuActivity extends AppCompatActivity {
                     }
                 }
 
-                // Cập nhật UI, biểu đồ và giờ cao điểm
                 updateUI(monthlyOrdersCount, monthlyRevenueValue, dailyOrdersCount, dailyRevenueValue, peakHourCounts, ordersList);
                 updateBarChart(monthlyRevenueValue);
                 updatePeakHours(peakHourCounts);
@@ -167,7 +213,6 @@ public class DoanhthuActivity extends AppCompatActivity {
         });
     }
 
-    // Lớp lưu trữ thông tin đơn hàng
     private static class Order {
         String id;
         long timestamp;
@@ -182,23 +227,18 @@ public class DoanhthuActivity extends AppCompatActivity {
         }
     }
 
-    // Cập nhật giao diện
     private void updateUI(int monthlyOrdersCount, double monthlyRevenueValue, int dailyOrdersCount, double dailyRevenueValue, int[] peakHourCounts, ArrayList<Order> ordersList) {
-        // Định dạng số
         String formattedMonthlyRevenue = formatNumber(monthlyRevenueValue);
         String formattedDailyRevenue = formatNumber(dailyRevenueValue);
 
-        // Cập nhật TextView
         monthlyOrders.setText(String.valueOf(monthlyOrdersCount));
         monthlyRevenue.setText(formattedMonthlyRevenue + " đ");
         dailyOrders.setText(String.valueOf(dailyOrdersCount));
         dailyRevenue.setText(formattedDailyRevenue + " đ");
 
-        // Cập nhật danh sách thông báo
         updateNotifications(ordersList);
     }
 
-    // Cập nhật biểu đồ doanh thu
     private void updateBarChart(double totalRevenueValue) {
         ArrayList<BarEntry> barEntries = new ArrayList<>();
         barEntries.add(new BarEntry(0f, (float) totalRevenueValue));
@@ -212,17 +252,13 @@ public class DoanhthuActivity extends AppCompatActivity {
         barChart.invalidate();
     }
 
-    // Cập nhật giờ cao điểm
     private void updatePeakHours(int[] peakHourCounts) {
-        // Tìm giá trị lớn nhất để chuẩn hóa độ dài thanh
         int maxCount = 0;
         for (int count : peakHourCounts) {
             if (count > maxCount) {
                 maxCount = count;
             }
         }
-
-        // Chuẩn hóa độ dài thanh (tối đa 100%)
         if (maxCount > 0) {
             float ratio10h = (float) peakHourCounts[0] / maxCount;
             float ratio15h = (float) peakHourCounts[1] / maxCount;
@@ -242,7 +278,6 @@ public class DoanhthuActivity extends AppCompatActivity {
         bar.setLayoutParams(params);
     }
 
-    // Cập nhật danh sách thông báo
     private void updateNotifications(ArrayList<Order> ordersList) {
         notificationsContainer.removeAllViews();
 
@@ -259,13 +294,10 @@ public class DoanhthuActivity extends AppCompatActivity {
             return;
         }
 
-        // Sắp xếp đơn hàng theo thời gian (mới nhất trước)
         ordersList.sort((a, b) -> Long.compare(b.timestamp, a.timestamp));
 
-        // Giới hạn 10 đơn hàng gần nhất
         int maxOrders = Math.min(ordersList.size(), 10);
 
-        // Thời gian hiện tại
         long currentTimeMillis = System.currentTimeMillis();
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault());
 
@@ -344,7 +376,6 @@ public class DoanhthuActivity extends AppCompatActivity {
         }
     }
 
-    // Định dạng số với dấu phân cách hàng nghìn
     private String formatNumber(double value) {
         DecimalFormat decimalFormat = new DecimalFormat("#,###");
         return decimalFormat.format(value);
