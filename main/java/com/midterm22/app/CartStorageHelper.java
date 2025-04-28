@@ -21,6 +21,12 @@ public class CartStorageHelper {
         editor.putString(KEY_CART + "_" + userId, json);  // Store cart with user ID as part of the key
         editor.apply();
     }
+    public static void clearCart(Context context, String userId) {
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE); // dùng PREF_NAME đúng
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(KEY_CART + "_" + userId); // remove theo đúng key đã lưu
+        editor.apply();
+    }
 
     public static Cart getCart(Context context, String userId) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);

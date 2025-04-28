@@ -121,20 +121,25 @@ public class OrderDetailActivity extends AppCompatActivity {
         int bgColor;
 
         switch (status) {
-            case "pending":
+            case "Pending":
                 statusText = "CHỜ XỬ LÝ";
-                bgColor = 0xFFFFA000; // Orange
+                bgColor = 0xFFFB8C00; // Orange
                 btnCancelOrder.setVisibility(View.VISIBLE);
                 break;
-            case "processing":
+            case "Confirm":
+                statusText = "XÁC NHẬN";
+                bgColor = 0xFF4CAF50;
+                btnCancelOrder.setVisibility(View.VISIBLE);
+                break;
+            case "Shipping":
                 statusText = "ĐANG GIAO";
                 bgColor = 0xFF1976D2; // Blue
                 break;
-            case "completed":
+            case "Complete":
                 statusText = "HOÀN THÀNH";
                 bgColor = 0xFF388E3C; // Green
                 break;
-            case "cancelled":
+            case "Cancelled":
                 statusText = "ĐÃ HỦY";
                 bgColor = 0xFFD32F2F; // Red
                 break;

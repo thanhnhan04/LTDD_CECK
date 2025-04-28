@@ -20,6 +20,8 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:scaleType="centerCrop"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:src="@drawable/placeholder" />
 
         <!-- Thông tin món ăn -->
@@ -67,8 +69,8 @@
 
                 <ImageButton
                     android:id="@+id/btn_decrease"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:backgroundTint="#D50000"
                     android:src="@drawable/ic_minus"
                     android:background="@drawable/bg_rounded_red"
@@ -84,20 +86,14 @@
 
                 <ImageButton
                     android:id="@+id/btn_increase"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:backgroundTint="#D50000"
                     android:src="@drawable/ic_add"
                     android:background="@drawable/bg_rounded_red"
                     app:tint="#FFFFFF" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/btn_edit"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="12dp"
-                android:src="@drawable/baseline_edit_24" />
 
             <ImageView
                 android:id="@+id/btn_delete"

@@ -118,15 +118,6 @@ public class MenuActivity extends BaseActivity implements ProductAdapter.OnProdu
             tab_noodles.setTypeface(null, Typeface.BOLD);
             loadProductsByCategory("cat_noodles");
         });
-//        tab_pizza.setOnClickListener(v -> loadProductsByCategory("cat_pizza"));
-//        tab_fries.setOnClickListener(v -> loadProductsByCategory("cat_fries"));
-//        tab_drink.setOnClickListener(v -> loadProductsByCategory("cat_drinks"));
-//
-//        // 3 tab mới
-//        tab_combo.setOnClickListener(v -> loadProductsByCategory("cat_combo"));
-//        tab_chicken.setOnClickListener(v -> loadProductsByCategory("cat_chicken"));
-//        tab_noodles.setOnClickListener(v -> loadProductsByCategory("cat_noodles"));
-
     }
 
     private void loadProductsByCategory(String categoryId) {

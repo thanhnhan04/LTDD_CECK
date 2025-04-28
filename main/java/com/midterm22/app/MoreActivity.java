@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class MoreActivity extends BaseActivity {
     private TextView tv_name;
-    private LinearLayout logoutButton, lout_list_order, edit_account;
+    private LinearLayout logoutButton, lout_list_order, edit_account, lout_support;
     private SharedPreferences sharedPref;
     private FirebaseAuth mAuth;
 
@@ -37,6 +37,7 @@ public class MoreActivity extends BaseActivity {
         tv_name = findViewById(R.id.tv_name);
         logoutButton = findViewById(R.id.lout_log_out);
         lout_list_order = findViewById(R.id.lout_list_order);
+        lout_support = findViewById(R.id.lout_support);
         edit_account = findViewById(R.id.edit_account);
         sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
     }
@@ -50,27 +51,24 @@ public class MoreActivity extends BaseActivity {
         logoutButton.setOnClickListener(v -> logout());
 
         lout_list_order.setOnClickListener(v -> navigateToListOrderActivity());
-
+        lout_support.setOnClickListener(v -> navigateToSupportActivity());
         edit_account.setOnClickListener(v -> navigateToEditProfile());
     }
 
     private void navigateToEditProfile() {
         Intent intent = new Intent(this, EditProfileActivity.class);
-
-        // Pass current user data to EditProfileActivity
-        intent.putExtra("user_name", sharedPref.getString("user_name", ""));
-        intent.putExtra("user_email", sharedPref.getString("user_email", ""));
-        intent.putExtra("user_phone", sharedPref.getString("user_phone", ""));
-        intent.putExtra("user_address", sharedPref.getString("user_address", ""));
-
-        startActivity(intent);
-
-        // Add transition animation
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        startActivity(intent);
     }
 
     private void navigateToListOrderActivity() {
         Intent intent = new Intent(this, ListOrderActivity.class);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+
+    private void navigateToSupportActivity() {
+        Intent intent = new Intent(this, SupportActivity.class);
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }

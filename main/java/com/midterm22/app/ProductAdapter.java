@@ -1,5 +1,9 @@
 package com.midterm22.app;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -74,18 +78,65 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         });
 
         holder.btnAddToCart.setOnClickListener(v -> {
-            CartItem item = new CartItem();
-            item.setProductId(product.getId());
-            item.setProductName(product.getName());
-            item.setProductImageUrl(product.getImageUrl());
-            item.setPrice(product.getPrice());
-            item.setQuantity(1);
-            item.setCreatedAt(String.valueOf(System.currentTimeMillis()));
-            Log.d("AddToCart", "Add to cart clicked for product: " + product.getName());
+            // Lấy vị trí của nút "Add to Cart"
+            int[] startLocation = new int[2];
+            holder.btnAddToCart.getLocationInWindow(startLocation);
 
-            addToCart(item);
+            // Lấy vị trí và kích thước của giỏ hàng (cart_button) từ BaseActivity
+            int[] endLocation = new int[2];
+            View cartView = ((BaseActivity) context).findViewById(R.id.cart_button);  // Truy cập `cart_button` trong BaseActivity
+            cartView.getLocationInWindow(endLocation);
+
+            // Lấy chiều rộng và chiều cao của giỏ hàng
+            int cartWidth = cartView.getWidth();
+            int cartHeight = cartView.getHeight();
+
+            // Tính toán vị trí căn giữa của giỏ hàng
+            int centerX = endLocation[0] + cartWidth / 2;
+            int centerY = endLocation[1] + cartHeight / 2;
+
+            // Tạo image di chuyển từ nút "Add to Cart" đến giỏ hàng
+            ImageView imageView = new ImageView(context);
+            imageView.setImageResource(R.drawable.ic_pickup);
+            imageView.setColorFilter(0xFFFFA000, android.graphics.PorterDuff.Mode.SRC_IN);            imageView.setLayoutParams(new ViewGroup.LayoutParams(80, 80)); // Kích thước icon
+            ((ViewGroup) holder.itemView.getRootView()).addView(imageView); // Thêm vào layout cha
+
+            // Tạo chuyển động từ nút đến giỏ hàng
+            ObjectAnimator translateX = ObjectAnimator.ofFloat(imageView, "translationX", startLocation[0], centerX - 40);  // 40 là bán kính của icon để căn giữa
+            ObjectAnimator translateY = ObjectAnimator.ofFloat(imageView, "translationY", startLocation[1], centerY - 40);  // 40 là bán kính của icon để căn giữa
+            ObjectAnimator fadeOut = ObjectAnimator.ofFloat(imageView, "alpha", 1f, 0f);  // Giảm độ mờ để làm icon biến mất
+            fadeOut.setStartDelay(500);  // Đợi cho animation di chuyển xong rồi mới bắt đầu fadeOut
+
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(translateX, translateY, fadeOut);  // Kết hợp các animation
+            animatorSet.setDuration(1000); // Thời gian di chuyển (1000ms)
+            animatorSet.start();
+
+            // Sau khi di chuyển hoàn tất, thêm sản phẩm vào giỏ hàng
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+
+                    // Sau khi di chuyển và icon biến mất, thêm sản phẩm vào giỏ hàng
+                    CartItem item = new CartItem();
+                    item.setProductId(product.getId());
+                    item.setProductName(product.getName());
+                    item.setProductImageUrl(product.getImageUrl());
+                    item.setPrice(product.getPrice());
+                    item.setQuantity(1);
+                    item.setCreatedAt(String.valueOf(System.currentTimeMillis()));
+
+                    addToCart(item); // Thêm vào giỏ hàng
+
+                    // Ẩn icon sau khi animation kết thúc (nếu chưa thực hiện fadeOut)
+                    imageView.setVisibility(View.GONE);
+                }
+            });
         });
+
     }
+
 
     @Override
     public int getItemCount() {
@@ -94,8 +145,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     public static class ProductViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvDescription, tvPrice;
-        ImageView imgProduct;
-        ImageView btnAddToCart;
+        ImageView imgProduct, btnAddToCart;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -127,7 +177,6 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         CartStorageHelper.saveCart(context, cart, userId);  // Pass the user ID to save the cart
         Log.d("AddToCart", "Item saved. Total items: " + cart.getItems().size());
     }
-
 
     private Cart getCartFromStorage() {
         SharedPreferences prefs = context.getSharedPreferences("cart", Context.MODE_PRIVATE);

@@ -1,6 +1,9 @@
 package com.midterm22.app.model;
 
-public class CartItem {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class CartItem implements Parcelable {
     private String id;
     private String productId;
     private String productName;
@@ -68,5 +71,44 @@ public class CartItem {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    // Parcelable implementation
+    protected CartItem(Parcel in) {
+        id = in.readString();
+        productId = in.readString();
+        productName = in.readString();
+        productImageUrl = in.readString();
+        price = in.readDouble();
+        quantity = in.readInt();
+        createdAt = in.readString();
+    }
+
+    public static final Creator<CartItem> CREATOR = new Creator<CartItem>() {
+        @Override
+        public CartItem createFromParcel(Parcel in) {
+            return new CartItem(in);
+        }
+
+        @Override
+        public CartItem[] newArray(int size) {
+            return new CartItem[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(productId);
+        dest.writeString(productName);
+        dest.writeString(productImageUrl);
+        dest.writeDouble(price);
+        dest.writeInt(quantity);
+        dest.writeString(createdAt);
     }
 }

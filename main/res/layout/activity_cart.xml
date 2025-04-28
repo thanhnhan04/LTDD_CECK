@@ -25,7 +25,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phẩm ăn đã chọn"
+            android:text="Phần ăn đã chọn"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -71,7 +71,7 @@
                 android:id="@+id/tv_total_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="35,000 đ"
+                android:text="0,000 đ"
                 android:textColor="#D50000"
                 android:textSize="18sp"
                 android:textStyle="bold" />

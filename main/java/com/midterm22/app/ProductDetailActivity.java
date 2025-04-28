@@ -19,6 +19,7 @@ import com.midterm22.app.model.CartItem;
 import com.midterm22.app.model.Product;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 public class ProductDetailActivity extends AppCompatActivity {
@@ -28,9 +29,10 @@ public class ProductDetailActivity extends AppCompatActivity {
     private ImageButton btnDecrease, btnIncrease;
     private Button btnAddToCart, btnBuyNow;
     private int quantity = 1;
-    private double productPrice = 35000; // mặc định, sẽ được ghi đè
+    private double productPrice = 0; // mặc định, sẽ được ghi đè
     private String productId;
     private Context context;
+    private Cart cart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,13 +111,25 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                         // Sự kiện mua ngay
                         btnBuyNow.setOnClickListener(v -> {
+                            // Tạo CartItem cho sản phẩm hiện tại
+                            CartItem item = new CartItem();
+                            item.setProductId(productId);
+                            item.setProductName(tvProductName.getText().toString());
+                            item.setProductImageUrl(product.getImageUrl());
+                            item.setPrice(product.getPrice());
+                            item.setQuantity(quantity); // Số lượng hiện tại
+                            item.setCreatedAt(String.valueOf(System.currentTimeMillis()));
+
+                            // Tạo một ArrayList chứa món ăn duy nhất và truyền vào PaymentActivity
+                            ArrayList<CartItem> cartItems = new ArrayList<>();
+                            cartItems.add(item);
+
+                            // Chuyển đến PaymentActivity với danh sách sản phẩm
                             Intent intent = new Intent(ProductDetailActivity.this, PaymentActivity.class);
-                            intent.putExtra("product_name", product.getName());
-                            intent.putExtra("product_price", product.getPrice());
-                            intent.putExtra("quantity", quantity);
-                            intent.putExtra("total_price", quantity * product.getPrice());
+                            intent.putParcelableArrayListExtra("cart_items", cartItems);  // Truyền sản phẩm hiện tại
                             startActivity(intent);
                         });
+
                     }
                 } else {
                     Toast.makeText(ProductDetailActivity.this, "Không tìm thấy sản phẩm", Toast.LENGTH_SHORT).show();

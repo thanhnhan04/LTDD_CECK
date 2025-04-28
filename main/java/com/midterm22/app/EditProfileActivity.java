@@ -1,17 +1,14 @@
 package com.midterm22.app;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.midterm22.app.model.User;
@@ -30,8 +27,7 @@ public class EditProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_profile);
 
         initViews();
-        loadIntentData();
-        setupFirebase();
+        loadUserData();
         setupUpdateButton();
     }
 
@@ -44,21 +40,35 @@ public class EditProfileActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
     }
 
-    private void loadIntentData() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            etName.setText(intent.getStringExtra("user_name"));
-            etEmail.setText(intent.getStringExtra("user_email"));
-            etPhone.setText(intent.getStringExtra("user_phone"));
-            etAddress.setText(intent.getStringExtra("user_address"));
-        }
-    }
-
-    private void setupFirebase() {
+    private void loadUserData() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             userId = currentUser.getUid();
-            userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+            userRef = FirebaseDatabase.getInstance().getReference("User").child(userId);
+
+            // Lấy thông tin người dùng từ Firebase Realtime Database
+            userRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DataSnapshot dataSnapshot = task.getResult();
+                    if (dataSnapshot.exists()) {
+                        String name = dataSnapshot.child("name").getValue(String.class);
+                        String email = dataSnapshot.child("email").getValue(String.class);
+                        String phone = dataSnapshot.child("phone").getValue(String.class);
+                        String address = dataSnapshot.child("address").getValue(String.class);
+
+                        // Hiển thị dữ liệu lên các trường nhập liệu
+                        etName.setText(name);
+                        etEmail.setText(email);
+                        etPhone.setText(phone);
+                        etAddress.setText(address);
+                    }
+                } else {
+                    Toast.makeText(this, "Lỗi khi tải dữ liệu người dùng", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "Bạn chưa đăng nhập", Toast.LENGTH_SHORT).show();
+            finish(); // Hoặc điều hướng người dùng về màn hình đăng nhập
         }
     }
 
@@ -87,8 +97,21 @@ public class EditProfileActivity extends AppCompatActivity {
         updatedUser.setRole("customer");
         updatedUser.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
 
+        // Cập nhật vào Firebase Realtime Database
         userRef.setValue(updatedUser)
                 .addOnSuccessListener(aVoid -> {
+                    // Nếu người dùng thay đổi email trong Firebase Auth, cập nhật email.
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null && !user.getEmail().equals(email)) {
+                        user.updateEmail(email)
+                                .addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(this, "Cập nhật email thành công", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(this, "Cập nhật email thất bại: " + task.getException(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
                     Toast.makeText(this, "Cập nhật thành công", Toast.LENGTH_SHORT).show();
                     finish();
                 })

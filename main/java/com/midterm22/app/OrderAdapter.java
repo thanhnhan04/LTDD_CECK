@@ -76,20 +76,22 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         private String getStatusText(String status) {
             switch (status) {
-                case "pending": return "Chờ xử lý";
-                case "processing": return "Đang giao";
-                case "completed": return "Hoàn thành";
-                case "cancelled": return "Đã hủy";
+                case "Pending": return "Chờ xử lý";
+                case "Confirm": return "Xác nhận";
+                case "Shipping": return "Đang giao";
+                case "Complete": return "Hoàn thành";
+                case "Cancelled": return "Đã hủy";
                 default: return status;
             }
         }
 
         private int getStatusColor(String status) {
             switch (status) {
-                case "pending": return 0xFFFB8C00; // Orange
-                case "processing": return 0xFF1976D2; // Blue
-                case "completed": return 0xFF388E3C; // Green
-                case "cancelled": return 0xFFD32F2F; // Red
+                case "Pending": return 0xFFFB8C00; // Orange
+                case "Confirm": return 0xFF4CAF50; // Green
+                case "Shipping": return 0xFF1976D2; // Blue
+                case "Complete": return 0xFF388E3C; // Green
+                case "Cancelled": return 0xFFD32F2F; // Red
                 default: return 0xFF000000; // Black
             }
         }
