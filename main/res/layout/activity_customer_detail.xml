@@ -11,8 +11,10 @@
         android:background="#FF6F00"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:title=""
-        app:titleTextColor="@android:color/white">
-
+        app:titleTextColor="@android:color/white"
+        android:navigationIcon="@drawable/baseline_arrow_back_24"
+        android:contentInsetStart="0dp"
+        android:contentInsetLeft="0dp">
         <TextView
             android:id="@+id/toolbar_title"
             android:layout_width="match_parent"
@@ -24,8 +26,6 @@
             android:textSize="20sp" />
     </androidx.appcompat.widget.Toolbar>
 
-
-    <!-- Nội dung có padding riêng -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,6 +66,7 @@
             android:textSize="16sp"
             android:padding="8dp" />
 
+        <!-- Nút khóa/mở tài khoản -->
         <Button
             android:id="@+id/btnToggleStatus"
             android:layout_width="match_parent"
@@ -76,5 +77,26 @@
             android:padding="16dp"
             android:textSize="18sp"
             android:backgroundTint="#FFC107"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerOrders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_gravity="center" />
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Không có đơn hàng"
+            android:visibility="gone"
+            android:layout_gravity="center"
+            android:textColor="#FF7043"
+            android:textSize="16sp" />
     </LinearLayout>
 </LinearLayout>

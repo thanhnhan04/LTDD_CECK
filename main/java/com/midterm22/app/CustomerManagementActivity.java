@@ -69,11 +69,11 @@ public class CustomerManagementActivity extends AppCompatActivity {
                 if (tab.getPosition() == 0) {
                     rvActiveCustomers.setVisibility(View.VISIBLE);
                     rvLockedCustomers.setVisibility(View.GONE);
-                    activeAdapter.setCustomers(activeCustomerList, true);  // Active list
+                    activeAdapter.setCustomers(activeCustomerList, true);
                 } else {
                     rvActiveCustomers.setVisibility(View.GONE);
                     rvLockedCustomers.setVisibility(View.VISIBLE);
-                    lockedAdapter.setCustomers(inactiveCustomerList, false);  // Locked list
+                    lockedAdapter.setCustomers(inactiveCustomerList, false);
                 }
             }
 
@@ -149,7 +149,7 @@ public class CustomerManagementActivity extends AppCompatActivity {
                 Log.d("CustomerData", "Active users: " + activeCustomerList.size());
                 Log.d("CustomerData", "Locked users: " + inactiveCustomerList.size());
 
-                // Sửa lại nè:
+
                 activeAdapter.setCustomers(activeCustomerList, true);
                 lockedAdapter.setCustomers(inactiveCustomerList, false);
             }

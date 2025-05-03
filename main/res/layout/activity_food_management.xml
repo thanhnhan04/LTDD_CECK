@@ -5,12 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Nội dung chính của màn hình -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -19,7 +17,6 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            <!-- LinearLayout để chứa tiêu đề và căn giữa -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -39,7 +36,6 @@
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- Thanh tìm kiếm (SearchView) -->
         <androidx.appcompat.widget.SearchView
             android:id="@+id/searchView"
             android:layout_width="match_parent"
@@ -50,7 +46,6 @@
             app:queryHint="Tìm kiếm sản phẩm..."
             android:background="?attr/selectableItemBackgroundBorderless" />
 
-        <!-- Tab chuyển đổi giữa Món ăn hiện tại và Món ăn đã ẩn -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
@@ -61,7 +56,6 @@
             app:tabSelectedTextColor="@color/black"
             app:tabTextColor="@color/gray" />
 
-        <!-- RecyclerView cho Món ăn hiện tại -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvCurrentFoods"
             android:layout_width="match_parent"
@@ -69,7 +63,6 @@
             android:layout_below="@id/tabLayout"
             android:visibility="visible" />
 
-        <!-- RecyclerView cho Món ăn đã ẩn -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvHiddenFoods"
             android:layout_width="match_parent"
@@ -77,7 +70,6 @@
             android:layout_below="@id/tabLayout"
             android:visibility="gone" />
 
-        <!-- FloatingActionButton -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnAddFood"
             android:layout_width="wrap_content"
@@ -89,13 +81,12 @@
             app:srcCompat="@drawable/baseline_add_24" />
     </RelativeLayout>
 
-    <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:menu="@menu/drawer_menu_ad"
+        app:menu="@menu/drawer_menu"
         app:itemTextAppearance="@style/DrawerMenuTextStyle" />
 </androidx.drawerlayout.widget.DrawerLayout>
