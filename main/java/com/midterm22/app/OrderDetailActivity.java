@@ -158,7 +158,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     }
 
     private void cancelOrder() {
-        ordersRef.child("status").setValue("cancelled")
+        ordersRef.child("status").setValue("Cancelled")
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Đã hủy đơn hàng", Toast.LENGTH_SHORT).show();
                     finish();
@@ -169,7 +169,13 @@ public class OrderDetailActivity extends AppCompatActivity {
     }
 
     private void reorder() {
-
-        Toast.makeText(this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+        ordersRef.child("status").setValue("Pending")
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi khi đặt lại đơn: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
     }
 }
