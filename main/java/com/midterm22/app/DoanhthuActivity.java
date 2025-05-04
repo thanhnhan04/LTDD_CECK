@@ -1,5 +1,6 @@
 package com.midterm22.app;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -7,9 +8,14 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import android.util.Log;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,7 +34,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class DoanhthuActivity extends AppCompatActivity {
-
+    private DrawerLayout drawerLayout;
     private TextView monthlyOrders, monthlyRevenue, dailyOrders, dailyRevenue;
     private BarChart barChart;
     private Button btnToggleChart;
@@ -57,6 +63,37 @@ public class DoanhthuActivity extends AppCompatActivity {
         // Kết nối Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         DatabaseReference ordersRef = databaseReference.child("orders");
+        // Thiết lập Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Thiết lập Navigation Drawer
+        drawerLayout = findViewById(R.id.drawerLayout);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, AdminActivity.class));
+
+            } else if (id == R.id.nav_qldh) {
+                startActivity(new Intent(this, ManagerOrderActivity.class));
+            } else if (id == R.id.nav_qlsp) {
+                startActivity(new Intent(this, FoodManagementActivity.class));
+            } else if (id == R.id.nav_qlkh) {
+            } else if (id == R.id.nav_qldt) {
+                startActivity(new Intent(this, DoanhthuActivity.class));
+            } else if (id == R.id.nav_logout) {
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+            }
+            drawerLayout.closeDrawer(navigationView);
+            return true;
+        });
 
         // Xử lý nút toggle biểu đồ
         btnToggleChart.setOnClickListener(v -> {

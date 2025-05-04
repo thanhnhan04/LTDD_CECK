@@ -31,7 +31,7 @@ public class AdminActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
-        btnProfile = findViewById(R.id.btnProfile); // Thêm dòng này để ánh xạ btnProfile
+        btnProfile = findViewById(R.id.btnProfile);// Thêm dòng này để ánh xạ btnProfile
 
         cardCustomers = findViewById(R.id.cardCustomers);
         cardOrders = findViewById(R.id.cardOrders);

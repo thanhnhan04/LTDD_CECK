@@ -114,6 +114,8 @@ public class CustomerManagementActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) {
+                startActivity(new Intent(this, AdminActivity.class));
+
             } else if (id == R.id.nav_qldh) {
                 startActivity(new Intent(this, ManagerOrderActivity.class));
             } else if (id == R.id.nav_qlsp) {

@@ -76,15 +76,22 @@ public class ManagerOrderActivity extends AppCompatActivity {
         toggle.syncState();
 
         navigationView.setNavigationItemSelectedListener(item -> {
-            String selectedStatus = "all";
-            switch (item.getItemId()) {
-                default:
-                    Toast.makeText(this, "Chức năng chưa được hỗ trợ!", Toast.LENGTH_SHORT).show();
-                    break;
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, AdminActivity.class));
+
+            } else if (id == R.id.nav_qldh) {
+                startActivity(new Intent(this, ManagerOrderActivity.class));
+            } else if (id == R.id.nav_qlsp) {
+                startActivity(new Intent(this, FoodManagementActivity.class));
+            } else if (id == R.id.nav_qlkh) {
+            } else if (id == R.id.nav_qldt) {
+                startActivity(new Intent(this, DoanhthuActivity.class));
+            } else if (id == R.id.nav_logout) {
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
             }
-            filterOrders(selectedStatus);
-            updateMenuOptionSelection(selectedStatus);
-            drawerLayout.closeDrawer(GravityCompat.START);
+            drawerLayout.closeDrawer(navigationView);
             return true;
         });
 

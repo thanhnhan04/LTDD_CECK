@@ -83,24 +83,21 @@ public class FoodManagementActivity extends AppCompatActivity {
         NavigationView navigationView = findViewById(R.id.navigationView);
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
-
-            // Handling menu item clicks
             if (id == R.id.nav_home) {
-                // Already on the homepage, do nothing
+                startActivity(new Intent(this, AdminActivity.class));
+
             } else if (id == R.id.nav_qldh) {
                 startActivity(new Intent(this, ManagerOrderActivity.class));
             } else if (id == R.id.nav_qlsp) {
                 startActivity(new Intent(this, FoodManagementActivity.class));
             } else if (id == R.id.nav_qlkh) {
-                startActivity(new Intent(this, CustomerManagementActivity.class));
             } else if (id == R.id.nav_qldt) {
                 startActivity(new Intent(this, DoanhthuActivity.class));
             } else if (id == R.id.nav_logout) {
                 startActivity(new Intent(this, LoginActivity.class));
-                finish();  // Close current activity to prevent going back
+                finish();
             }
-
-            drawerLayout.closeDrawers(); // Close the drawer after an item is selected
+            drawerLayout.closeDrawer(navigationView);
             return true;
         });
 
