@@ -1,10 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".PolicyActivity">
+    android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#D50000"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Quay lại"
+            android:src="@drawable/c_arrow_back"
+            app:tint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Thông Tin Chính sách"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- Nội dung chính sách -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvPolicyContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:lineSpacingExtra="6dp"
+            android:textColor="#333333"
+            android:text="🍔 𝗚𝗶𝗼̛́𝗶 𝘁𝗵𝗶𝗲̣̂𝘂 𝗱𝘂̛̣ 𝗮́𝗻 FastFood Now:\n\nFastFood Now là ứng dụng đặt đồ ăn nhanh tiện lợi, hiện đại và thân thiện với người dùng. Với hàng trăm món ăn từ nhiều cửa hàng nổi tiếng, bạn có thể đặt hàng chỉ với vài thao tác đơn giản.\n\n🚀 Tính năng nổi bật:\n- Đặt món nhanh chóng chỉ với 1 chạm.\n- Theo dõi đơn hàng theo thời gian thực.\n- Ưu đãi hấp dẫn mỗi ngày.\n- Hỗ trợ nhiều phương thức thanh toán.\n\n🔒 𝗖𝗵𝗶́𝗻𝗵 𝘀𝗮́𝗰𝗵 𝗯𝗮̉𝗼 𝗺𝗮̣̂𝘁:\n1. Chúng tôi cam kết bảo vệ thông tin cá nhân người dùng.\n2. Mọi dữ liệu được mã hóa và lưu trữ an toàn.\n3. Không chia sẻ thông tin với bên thứ ba khi chưa có sự đồng ý.\n\n📜 𝗗𝗶𝗲̂̀𝘂 𝗸𝗵𝗼𝗮̉𝗻 𝘀𝘂̛̉ 𝗱𝘂̣𝗻𝗴:\n1. Người dùng phải cung cấp thông tin chính xác khi đặt hàng.\n2. Không được sử dụng ứng dụng vào mục đích gian lận.\n3. Đơn hàng có thể bị hủy nếu phát hiện hành vi bất thường.\n4. Chúng tôi có quyền cập nhật chính sách mà không cần báo trước.\n\n❤️ 𝗖𝗮̉𝗺 𝗼̛𝗻 𝗯𝗮̣𝗻 𝗱𝗮̃ 𝘀𝘂̛̉ 𝗱𝘂̣𝗻𝗴 FastFood Now. Chúc bạn ngon miệng!" />
+    </ScrollView>
+</LinearLayout>

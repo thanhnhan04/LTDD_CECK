@@ -1,6 +1,5 @@
 package com.midterm22.app.model;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +11,8 @@ public class Order {
     private String status; // "pending", "processing", "completed", "cancelled"
     private String createdAt;
     private String updatedAt;
+    private String note;
+    private String paymentMethod; // Mới thêm trường này
 
     public Order() {
         items = new HashMap<>();
@@ -27,7 +28,19 @@ public class Order {
         this.updatedAt = updatedAt;
     }
 
-    // Getter and Setter methods
+    public Order(String id, String customerId, Map<String, OrderItem> items, double total, String status, String createdAt, String updatedAt, String note, String paymentMethod) {
+        this.id = id;
+        this.customerId = customerId;
+        this.items = items;
+        this.total = total;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.note = note;
+        this.paymentMethod = paymentMethod; // Khởi tạo paymentMethod
+    }
+
+    // Getter và Setter methods
     public String getId() {
         return id;
     }
@@ -83,6 +96,24 @@ public class Order {
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    // Getter và Setter cho paymentMethod
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
     // Chuyển thành Map để lưu lên Firebase
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
@@ -100,6 +131,8 @@ public class Order {
         map.put("status", status);
         map.put("createdAt", createdAt);
         map.put("updatedAt", updatedAt);
+        map.put("note", note);
+        map.put("paymentMethod", paymentMethod); // Thêm trường paymentMethod vào Map
         return map;
     }
 }

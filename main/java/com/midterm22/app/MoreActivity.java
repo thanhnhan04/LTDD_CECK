@@ -7,11 +7,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MoreActivity extends BaseActivity {
     private TextView tv_name;
-    private LinearLayout logoutButton, lout_list_order, edit_account, lout_support;
+    private LinearLayout logoutButton,deal_id, lout_list_order, edit_account, lout_support,inf_policy;
     private SharedPreferences sharedPref;
     private FirebaseAuth mAuth;
 
@@ -39,6 +41,8 @@ public class MoreActivity extends BaseActivity {
         lout_list_order = findViewById(R.id.lout_list_order);
         lout_support = findViewById(R.id.lout_support);
         edit_account = findViewById(R.id.edit_account);
+        inf_policy = findViewById(R.id.inf_policy);
+        deal_id = findViewById(R.id.deal_id);
         sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
     }
 
@@ -53,6 +57,8 @@ public class MoreActivity extends BaseActivity {
         lout_list_order.setOnClickListener(v -> navigateToListOrderActivity());
         lout_support.setOnClickListener(v -> navigateToSupportActivity());
         edit_account.setOnClickListener(v -> navigateToEditProfile());
+        inf_policy.setOnClickListener(v-> navigateToPlicyActivity());
+        deal_id.setOnClickListener(v-> navigateToDealActivity());
     }
 
     private void navigateToEditProfile() {
@@ -72,17 +78,33 @@ public class MoreActivity extends BaseActivity {
         startActivity(intent);
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
-
+    private void navigateToPlicyActivity() {
+        Intent intent = new Intent(this, PolicyActivity.class);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
+    private void navigateToDealActivity() {
+        Intent intent = new Intent(this, DealActivity.class);
+        startActivity(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+    }
     private void logout() {
-        // Firebase logout
-        mAuth.signOut();
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận đăng xuất")
+                .setMessage("Bạn có chắc chắn muốn đăng xuất không?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> {
+                    // Firebase logout
+                    mAuth.signOut();
 
-        // Clear shared preferences
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.clear();
-        editor.apply();
+                    // Clear shared preferences
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.clear();
+                    editor.apply();
 
-        redirectToLogin();
+                    redirectToLogin();
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     private void redirectToLogin() {

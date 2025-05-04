@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,13 +23,15 @@ import com.midterm22.app.model.Order;
 import com.midterm22.app.model.OrderItem;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
-    private TextView tvOrderId, tvOrderDate, tvOrderStatus, tvSubtotal, tvShippingFee, tvTotal;
+    private TextView tvOrderId, tvOrderDate, tvOrderStatus, tvSubtotal, tvShippingFee, tvTotal, tvOrderNote, tvPaymentMethod;
     private RecyclerView recyclerOrderItems;
     private Button btnCancelOrder, btnReorder;
     private OrderItemAdapter adapter;
@@ -40,7 +43,8 @@ public class OrderDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_detail);
-
+        ImageButton btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> finish());
         // Nhận orderId từ Intent
         orderId = getIntent().getStringExtra("order_id");
         if (orderId == null) {
@@ -64,6 +68,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         recyclerOrderItems = findViewById(R.id.recyclerOrderItems);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
         btnReorder = findViewById(R.id.btnReorder);
+        tvOrderNote = findViewById(R.id.tvOrderNote);
+        tvPaymentMethod = findViewById(R.id.tvPaymentMethod);
 
         ordersRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
         orderItemsRef = FirebaseDatabase.getInstance().getReference("orderItems");
@@ -105,13 +111,34 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private void displayOrderInfo(Order order) {
         tvOrderId.setText("Đơn hàng #" + order.getId().substring(0, 6).toUpperCase());
-        tvOrderDate.setText("Ngày đặt: " + order.getCreatedAt());
+        String createdAt = order.getCreatedAt();
+        String formattedDate = createdAt != null ? createdAt : "N/A";
+        try {
+            long timestamp = Long.parseLong(createdAt);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+            formattedDate = sdf.format(new Date(timestamp));
+        } catch (NumberFormatException e) {
+            try {
+                String[] parts = createdAt.split(" ");
+                String[] dateParts = parts[0].split("-");
+                formattedDate = String.format("%s/%s/%s %s", dateParts[2], dateParts[1], dateParts[0], parts[1].substring(0, 5));
+            } catch (Exception ex) {
+                Log.w("OrderAdapter", "Error formatting date: " + createdAt);
+            }
+        }
+        // Ghi chú
+        String note = order.getNote();
+        tvOrderNote.setText(note != null && !note.isEmpty() ? note : "Không có ghi chú");
+
+        tvOrderDate.setText("Ngày đặt: " + formattedDate);
 
         // Định dạng tiền tệ
         NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         tvSubtotal.setText(format.format(order.getTotal()));
         tvTotal.setText(format.format(order.getTotal()));
-
+// Phương thức thanh toán
+        String payment = order.getPaymentMethod();
+        tvPaymentMethod.setText(payment != null && !payment.isEmpty() ? payment : "Chưa rõ");
         // Hiển thị trạng thái
         setOrderStatusUI(order.getStatus());
     }

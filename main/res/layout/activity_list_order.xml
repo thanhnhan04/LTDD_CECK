@@ -8,12 +8,15 @@
     android:padding="0dp"
     tools:context=".ListOrderActivity">
 
+
+
     <!-- Header -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="#D50000"
-        android:padding="12dp">
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp">
 
         <ImageButton
             android:id="@+id/btnBack"
@@ -30,13 +33,101 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="Danh sách đơn hàng"
+            android:textColor="#FFFFFF"
             android:textSize="20sp"
-            android:textColor="#FFF"
-            android:textStyle="bold"
-            android:layout_centerInParent="true" />
+            android:textStyle="bold" />
     </RelativeLayout>
+    <!-- Menu options -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:paddingVertical="8dp"
+        android:scrollbars="none">
 
+        <LinearLayout
+            android:id="@+id/menuOptionsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp">
+
+            <TextView
+                android:id="@+id/optionAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/selector_menu_option"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="All"
+                android:textColor="@color/selector_menu_text"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/optionPending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/selector_menu_option"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Pending"
+                android:textColor="@color/selector_menu_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/optionConfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/selector_menu_option"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Confirm"
+                android:textColor="@color/selector_menu_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/optionShipping"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/selector_menu_option"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Shipping"
+                android:textColor="@color/selector_menu_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/optionCompleted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/selector_menu_option"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Complete"
+                android:textColor="@color/selector_menu_text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/optionCancelled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:background="@drawable/selector_menu_option"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Cancelled"
+                android:textColor="@color/selector_menu_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </HorizontalScrollView>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerOrders"
         android:layout_width="match_parent"
@@ -59,4 +150,5 @@
         android:text="Không có đơn hàng nào"
         android:gravity="center"
         android:visibility="gone"/>
+
 </LinearLayout>

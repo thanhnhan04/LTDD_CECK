@@ -6,6 +6,36 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#B71C1C"
+        android:elevation="4dp"
+        android:layout_marginTop="0dp"> <!-- Remove top margin to make it stick to the top -->
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/c_arrow_back"
+            app:tint="#FFFFFF"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chi tiết món ăn"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="center" />
+    </com.google.android.material.appbar.MaterialToolbar>
+
     <!-- Phần cuộn nội dung -->
     <ScrollView
         android:layout_width="match_parent"
@@ -17,7 +47,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-            <!-- Ảnh sản phẩm với nút back -->
+
+
+            <!-- Ảnh sản phẩm -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
@@ -30,16 +62,8 @@
                     android:scaleType="centerCrop"
                     android:background="@drawable/bg_rounded_white"
                     android:clipToOutline="true" />
-
-                <ImageButton
-                    android:id="@+id/btn_back"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="16dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/c_arrow_back"
-                    android:elevation="4dp" />
             </RelativeLayout>
+
             <!-- Tên và giá -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -101,9 +125,7 @@
                     android:gravity="center"
                     android:text="1"
                     android:textSize="16sp"
-
                     android:background="@drawable/bg_rounded_white" />
-
 
                 <ImageButton
                     android:id="@+id/btn_increase"
@@ -114,7 +136,6 @@
                     android:background="@drawable/bg_rounded_red"
                     app:tint="#FFFFFF" />
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
 

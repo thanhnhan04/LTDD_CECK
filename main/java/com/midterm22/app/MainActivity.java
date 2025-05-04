@@ -26,9 +26,10 @@ import java.util.List;
 public class MainActivity extends BaseActivity implements ProductAdapter.OnProductClickListener {
     private static final String TAG = "MainActivity";
     TextView tv_name;
-    RecyclerView recyclerProducts;
-    ProductAdapter productAdapter;
+    RecyclerView recyclerProducts,recyclerCombo;
+    ProductAdapter productAdapter,comboAdapter;
     List<Product> productList = new ArrayList<>();
+    List<Product> comboList = new ArrayList<>();
     DatabaseReference productRef;
 
     @Override
@@ -63,6 +64,10 @@ public class MainActivity extends BaseActivity implements ProductAdapter.OnProdu
         productAdapter = new ProductAdapter(this, productList, this);
         recyclerProducts.setAdapter(productAdapter);
         Log.d(TAG, "RecyclerView setup completed");
+        recyclerCombo = findViewById(R.id.recyclerViewCombo);
+        recyclerCombo.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        comboAdapter = new ProductAdapter(this, comboList, this);
+        recyclerCombo.setAdapter(comboAdapter);
 
         try {
             productRef = FirebaseDatabase.getInstance().getReference("products");
@@ -71,28 +76,35 @@ public class MainActivity extends BaseActivity implements ProductAdapter.OnProdu
         } catch (Exception e) {
             Log.e(TAG, "Firebase error: " + e.getMessage(), e);
         }
+        loadComboProducts();
+
     }
 
     private void loadAllProducts() {
-        Log.d(TAG, "Attempting to load products from Firebase"); // Log 7
+        Log.d(TAG, "Attempting to load products from Firebase");
 
         productRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG, "onDataChange: Data snapshot received"); // Log 8
+                Log.d(TAG, "onDataChange: Data snapshot received");
                 productList.clear();
 
                 int productCount = 0;
                 for (DataSnapshot data : snapshot.getChildren()) {
                     Product product = data.getValue(Product.class);
                     if (product != null && product.isAvailable()) {
-                        productList.add(product);
-                        productCount++;
-                        Log.d(TAG, "Added product: " + product.getName());
+                        String name = product.getName().toLowerCase();
+                        if (!name.contains("combo")) {
+                            productList.add(product);
+                            productCount++;
+                            Log.d(TAG, "Added product: " + product.getName());
+                        } else {
+                            Log.d(TAG, "Skipped combo product: " + product.getName());
+                        }
                     }
                 }
 
-                Log.d(TAG, "Total products loaded: " + productCount);
+                Log.d(TAG, "Total non-combo products loaded: " + productCount);
                 productAdapter.setProductList(productList);
             }
 
@@ -100,6 +112,33 @@ public class MainActivity extends BaseActivity implements ProductAdapter.OnProdu
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "onCancelled: " + error.getMessage(), error.toException());
                 Toast.makeText(MainActivity.this, "Lỗi tải dữ liệu: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadComboProducts() {
+        Log.d(TAG, "Loading combo products...");
+
+        productRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                comboList.clear();
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    Product product = data.getValue(Product.class);
+                    if (product != null && product.isAvailable()) {
+                        // Lọc sản phẩm có chứa chữ "Combo" trong tên
+                        if (product.getName().toLowerCase().contains("combo")) {
+                            comboList.add(product);
+                            Log.d(TAG, "Combo found: " + product.getName());
+                        }
+                    }
+                }
+                comboAdapter.setProductList(comboList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "onCancelled (combo): " + error.getMessage(), error.toException());
             }
         });
     }
