@@ -1,5 +1,6 @@
 package com.midterm22.app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -69,7 +70,16 @@ public class CustomerDetailActivity extends AppCompatActivity {
 
         btnToggleStatus.setOnClickListener(view -> toggleUserStatus());
 
-        orderAdapter = new OrderAdminAdapter(this, customerOrders, null);
+        orderAdapter = new OrderAdminAdapter(this, customerOrders, new OrderAdminAdapter.OnOrderClickListener() {
+            @Override
+            public void onOrderClick(Order order) {
+                // Mở trang chi tiết đơn hàng
+                Intent intent = new Intent(CustomerDetailActivity.this, OrderDetailAdminActivity.class);
+                intent.putExtra("orderId", order.getId());
+                startActivity(intent);
+            }
+        });
+
         recyclerViewOrders.setAdapter(orderAdapter);
     }
 
@@ -121,7 +131,7 @@ public class CustomerDetailActivity extends AppCompatActivity {
         Log.d("CustomerDetail", "Bắt đầu tải lịch sử đơn hàng...");
 
         // Truy vấn đơn hàng theo customerId
-        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("Order");
+        DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders");
         orderRef.orderByChild("customerId").equalTo(userId)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

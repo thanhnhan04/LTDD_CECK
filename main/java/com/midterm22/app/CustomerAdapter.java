@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.midterm22.app.model.User;
@@ -20,11 +21,8 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
 
     private Context context;
     private List<User> customerList;
+    private List<User> customerListFull;  // List full để thực hiện tìm kiếm
     private OnItemClickListener listener;
-
-    // Màu sắc cho trạng thái
-    private static final int ACTIVE_COLOR = 0xFF4CAF50;  // Xanh
-    private static final int INACTIVE_COLOR = 0xFFF44336;  // Đỏ
 
     public interface OnItemClickListener {
         void onDetailsClick(User user);
@@ -37,11 +35,15 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
     public CustomerAdapter(Context context) {
         this.context = context;
         this.customerList = new ArrayList<>();
+        this.customerListFull = new ArrayList<>();  // Khởi tạo danh sách đầy đủ
     }
 
-    public void setCustomers(List<User> customers, boolean isActiveList) {
-        this.customerList = customers;
-        notifyDataSetChanged();
+    public void setCustomers(List<User> customers, boolean isActive) {
+        if (customers != null) {
+            this.customerList = customers;
+            this.customerListFull = new ArrayList<>(customers);  // Copy dữ liệu ban đầu vào danh sách đầy đủ
+            notifyDataSetChanged();
+        }
     }
 
     @NonNull
@@ -59,13 +61,12 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
         holder.tvEmail.setText("Email: " + user.getEmail());
         holder.imgAvatar.setImageResource(R.drawable.user);
 
-        if ("locked".equals(user.getRole())) {
-            holder.tvStatus.setText("Trạng thái: Đã khóa");
-            holder.tvStatus.setTextColor(INACTIVE_COLOR);
-        } else {
-            holder.tvStatus.setText("Trạng thái: Đang hoạt động");
-            holder.tvStatus.setTextColor(ACTIVE_COLOR);
-        }
+        boolean isLocked = "locked".equals(user.getRole());
+        holder.tvStatus.setText(isLocked ? "Trạng thái: Đã khóa" : "Trạng thái: Đang hoạt động");
+        holder.tvStatus.setTextColor(ContextCompat.getColor(
+                context,
+                isLocked ? R.color.red : R.color.green // Tạo 2 màu trong colors.xml
+        ));
 
         holder.btnDetails.setOnClickListener(v -> {
             if (listener != null) {
@@ -77,6 +78,21 @@ public class CustomerAdapter extends RecyclerView.Adapter<CustomerAdapter.Custom
     @Override
     public int getItemCount() {
         return customerList != null ? customerList.size() : 0;
+    }
+
+    public void filter(String text) {
+        customerList.clear();
+        if (text.isEmpty()) {
+            customerList.addAll(customerListFull);  // Nếu không tìm kiếm, hiển thị toàn bộ danh sách
+        } else {
+            text = text.toLowerCase();
+            for (User user : customerListFull) {
+                if (user.getName().toLowerCase().contains(text)) {  // Tìm kiếm theo tên khách hàng
+                    customerList.add(user);
+                }
+            }
+        }
+        notifyDataSetChanged();  // Cập nhật dữ liệu trong RecyclerView
     }
 
     public static class CustomerViewHolder extends RecyclerView.ViewHolder {

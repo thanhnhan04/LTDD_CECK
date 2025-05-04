@@ -77,7 +77,16 @@
             android:padding="16dp"
             android:textSize="18sp"
             android:backgroundTint="#FFC107"/>
-
+        <TextView
+            android:id="@+id/tvOrderHistoryTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lịch sử đặt hàng"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FF7043"
+            android:paddingTop="24dp"
+            android:paddingBottom="8dp" />
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerOrders"
             android:layout_width="match_parent"

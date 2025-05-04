@@ -1,5 +1,5 @@
 package com.midterm22.app;
-
+import androidx.appcompat.widget.SearchView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,6 +39,7 @@ public class CustomerManagementActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_management);
+        SearchView searchView = findViewById(R.id.searchView);
 
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
@@ -59,6 +60,23 @@ public class CustomerManagementActivity extends AppCompatActivity {
         inactiveCustomerList = new ArrayList<>();
 
         tabLayout = findViewById(R.id.tabLayout);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false; // không xử lý khi nhấn tìm
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                int selectedTab = tabLayout.getSelectedTabPosition();
+                if (selectedTab == 0) {
+                    activeAdapter.filter(newText);
+                } else {
+                    lockedAdapter.filter(newText);
+                }
+                return true;
+            }
+        });
 
         tabLayout.addTab(tabLayout.newTab().setText("Tài khoản hiện tại"));
         tabLayout.addTab(tabLayout.newTab().setText("Tài khoản bị khóa"));
@@ -124,7 +142,6 @@ public class CustomerManagementActivity extends AppCompatActivity {
             intent.putExtra("userId", user.getId());
             startActivity(intent);
         });
-
     }
 
     private void loadCustomers() {
@@ -149,7 +166,6 @@ public class CustomerManagementActivity extends AppCompatActivity {
                 Log.d("CustomerData", "Active users: " + activeCustomerList.size());
                 Log.d("CustomerData", "Locked users: " + inactiveCustomerList.size());
 
-
                 activeAdapter.setCustomers(activeCustomerList, true);
                 lockedAdapter.setCustomers(inactiveCustomerList, false);
             }
@@ -160,5 +176,4 @@ public class CustomerManagementActivity extends AppCompatActivity {
             }
         });
     }
-
 }
