@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
@@ -19,6 +20,12 @@
         <activity android:name=".OrderHistoryActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".DealActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PolicyActivity"
+            android:exported="false" />
         <activity
             android:name=".OrderDetailAdminActivity"
             android:exported="false" />

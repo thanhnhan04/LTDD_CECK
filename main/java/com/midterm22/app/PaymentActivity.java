@@ -2,10 +2,12 @@ package com.midterm22.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import com.midterm22.app.model.CartItem;
 import com.midterm22.app.model.Order;
 import com.midterm22.app.model.OrderItem;
@@ -52,6 +55,9 @@ public class PaymentActivity extends AppCompatActivity {
         edtName = findViewById(R.id.tv_address);
         edtAddress = findViewById(R.id.tv_name);
         edtPhone = findViewById(R.id.tv_phone);
+        EditText edtNote = findViewById(R.id.edt_note);
+        RadioGroup radioGroup = findViewById(R.id.radioPaymentMethods);
+        TextView paymentTextView = findViewById(R.id.paymentMethodTextView);
 
         // Load user data from Firebase
         loadUserData();
@@ -69,9 +75,18 @@ public class PaymentActivity extends AppCompatActivity {
         rvPaymentItems.setLayoutManager(new LinearLayoutManager(this));
         rvPaymentItems.setAdapter(paymentAdapter);
 
+        // Set up payment method listener
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            String selected = "Unknown";
+
+             if (checkedId == R.id.radioVNPay) selected = "VNPay";
+else selected = "Cash";
+
+            paymentTextView.setText("Thanh toán bằng: " + selected);
+        });
+
         // Calculate total price
         double total = cartItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
-
         tvTotalPrice.setText(String.format(" %.0fđ", total));
         tvSubTotalPrice.setText(String.format(" %.0fđ", total));
 
@@ -108,17 +123,22 @@ public class PaymentActivity extends AppCompatActivity {
             double finalTotal = finalCartItems.stream()
                     .mapToDouble(item -> item.getPrice() * item.getQuantity())
                     .sum();
-
-            // Tạo đơn hàng
+            String note = edtNote.getText().toString().trim();
+            String paymentMethod = paymentTextView.getText().toString(); // Lấy giá trị từ TextView
+             // Gán vào đối tượng Order
+            // Create the order object
             Order order = new Order();
             order.setId(orderId);
             order.setCustomerId(customerId);
             order.setTotal(finalTotal);
             order.setStatus("Pending");
+            order.setPaymentMethod(paymentMethod);
+            order.setNote(note.isEmpty() ? "" : note);
+
             order.setCreatedAt(String.valueOf(System.currentTimeMillis()));
             order.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
 
-            // Thêm các OrderItem vào order.getItems()
+            // Add order items to the order
             for (CartItem cartItem : finalCartItems) {
                 String orderItemId = mDatabase.child("orderItems").push().getKey();
                 if (orderItemId == null) continue;
@@ -132,15 +152,14 @@ public class PaymentActivity extends AppCompatActivity {
                 orderItem.setUnitPrice(cartItem.getPrice());
                 orderItem.setTotalPrice(cartItem.getPrice() * cartItem.getQuantity());
 
-                // Thêm vào Order.items
+                // Add to the order's items
                 order.getItems().put(orderItemId, orderItem);
             }
 
-            // Lưu đơn hàng lên Firebase
+            // Save order to Firebase
             mDatabase.child("orders").child(orderId).setValue(order.toMap())
                     .addOnSuccessListener(aVoid -> {
                         CartStorageHelper.clearCart(PaymentActivity.this, currentUser.getUid());
-
                         Toast.makeText(PaymentActivity.this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
                         Intent menuIntent = new Intent(PaymentActivity.this, MenuActivity.class);
                         menuIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -151,8 +170,6 @@ public class PaymentActivity extends AppCompatActivity {
                         Toast.makeText(PaymentActivity.this, "Lỗi khi đặt hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         });
-
-
     }
 
     private void loadUserData() {
@@ -169,9 +186,9 @@ public class PaymentActivity extends AppCompatActivity {
                         String phone = dataSnapshot.child("phone").getValue(String.class);
                         String address = dataSnapshot.child("address").getValue(String.class);
 
-                        edtName.setText("Tên: "+name);
-                        edtPhone.setText("Số điện thoại: "+phone);
-                        edtAddress.setText("Địa chỉ: "+address);
+                        edtName.setText("Tên: " + name);
+                        edtPhone.setText("Số điện thoại: " + phone);
+                        edtAddress.setText("Địa chỉ: " + address);
                     }
                 }
 

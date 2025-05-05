@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import com.midterm22.app.model.User;
 
 public class LoginActivity extends AppCompatActivity {
@@ -111,6 +112,9 @@ public class LoginActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     User user = snapshot.getValue(User.class);
                     if (user != null && user.getRole() != null && !user.getRole().isEmpty()) {
+                        // ✅ THÊM DÒNG NÀY
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+
                         navigateToRole(user);
                     } else {
                         Toast.makeText(LoginActivity.this, "Invalid user role", Toast.LENGTH_SHORT).show();

@@ -226,7 +226,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Combo Ưu Đãi"
+                android:text="Deal Ưu Đãi"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:padding="16dp"
@@ -239,6 +239,27 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:scrollbars="none" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Combo Gợi Ý"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:padding="16dp"
+                android:textColor="#000000"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewCombo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="32dp"
+                android:scrollbars="none"/>
+
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
