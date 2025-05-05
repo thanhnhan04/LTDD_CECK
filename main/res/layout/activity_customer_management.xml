@@ -14,6 +14,7 @@
         <!-- Toolbar với Menu (hamburger) -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#FF6F00"
