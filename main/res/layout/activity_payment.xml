@@ -106,7 +106,7 @@
                     android:id="@+id/recyclerOrderItems"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false" />
+                    android:nestedScrollingEnabled="true" />
 
                 <!-- Ghi chú đơn hàng -->
                 <TextView
