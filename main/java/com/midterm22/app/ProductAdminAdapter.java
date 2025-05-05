@@ -78,11 +78,9 @@ public class ProductAdminAdapter extends RecyclerView.Adapter<ProductAdminAdapte
 
         Log.d("FILTER_LIST", "Filtered products: " + filteredList.size() + " items matching query: " + query);
 
-        // Cập nhật danh sách sau khi lọc và thông báo thay đổi
         updateList(filteredList);
     }
 
-    // Phương thức cập nhật danh sách mới và notifyDataSetChanged
     public void updateList(List<Product> newList) {
         this.productList = newList;
         notifyDataSetChanged();  // Cập nhật giao diện

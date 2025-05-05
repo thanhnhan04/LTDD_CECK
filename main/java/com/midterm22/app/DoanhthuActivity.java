@@ -85,6 +85,7 @@ public class DoanhthuActivity extends AppCompatActivity {
             } else if (id == R.id.nav_qlsp) {
                 startActivity(new Intent(this, FoodManagementActivity.class));
             } else if (id == R.id.nav_qlkh) {
+                startActivity(new Intent(this, CustomerManagementActivity.class));
             } else if (id == R.id.nav_qldt) {
                 startActivity(new Intent(this, DoanhthuActivity.class));
             } else if (id == R.id.nav_logout) {
