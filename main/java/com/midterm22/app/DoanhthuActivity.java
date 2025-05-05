@@ -51,7 +51,7 @@ public class DoanhthuActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doanhthu);
-        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawerLayout);
         monthlyOrders = findViewById(R.id.monthly_orders);
         monthlyRevenue = findViewById(R.id.monthly_revenue);
         dailyOrders = findViewById(R.id.daily_orders);
@@ -100,37 +100,6 @@ public class DoanhthuActivity extends AppCompatActivity {
             return true;
         });
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        NavigationView navigationView = findViewById(R.id.navigationView);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_home) {
-                startActivity(new Intent(this, AdminActivity.class));
-            } else if (id == R.id.nav_qldh) {
-                startActivity(new Intent(this, ManagerOrderActivity.class));
-            } else if (id == R.id.nav_qlsp) {
-                startActivity(new Intent(this, FoodManagementActivity.class));
-            } else if (id == R.id.nav_qlkh) {
-                startActivity(new Intent(this, CustomerManagementActivity.class));
-            } else if (id == R.id.nav_qldt) {
-                startActivity(new Intent(this, DoanhthuActivity.class));
-            } else if (id == R.id.nav_logout) {
-                startActivity(new Intent(this, LoginActivity.class));
-                finish();
-            }
-
-            drawerLayout.closeDrawers();
-            return true;
-        });
         btnSearch = findViewById(R.id.btnSearch);
         btnProfile = findViewById(R.id.btnProfile);
         btnSearch.setOnClickListener(v -> {
