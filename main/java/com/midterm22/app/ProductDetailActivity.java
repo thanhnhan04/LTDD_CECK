@@ -40,7 +40,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_product_detail);
 
         context = ProductDetailActivity.this;
-
+        ImageButton btnBack = findViewById(R.id.btn_back);
+        btnBack.setOnClickListener(v -> finish());
         // Ánh xạ view
         tvProductName = findViewById(R.id.tv_product_name);
         tvProductPrice = findViewById(R.id.tv_product_price);
@@ -71,10 +72,6 @@ public class ProductDetailActivity extends AppCompatActivity {
                 updateTotal();
             }
         });
-
-        // Nút quay lại
-        ImageButton btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> finish());
 
         // Nhận product_id từ Intent
         productId = getIntent().getStringExtra("product_id");

@@ -62,12 +62,12 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
 
-//        // Xử lý sự kiện cho nút Deal/Khuyến mãi
-//        deal.setOnClickListener(v -> {
-//            if (!isCurrentActivity(DealActivity.class)) {
-//                navigateToActivity(DealActivity.class);
-//            }
-//        });
+        // Xử lý sự kiện cho nút Deal/Khuyến mãi
+        deal.setOnClickListener(v -> {
+            if (!isCurrentActivity(DealActivity.class)) {
+                navigateToActivity(DealActivity.class);
+            }
+        });
 
         // Xử lý sự kiện cho nút More
         more.setOnClickListener(v -> {

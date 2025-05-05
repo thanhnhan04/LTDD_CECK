@@ -1,6 +1,7 @@
 package com.midterm22.app;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import com.midterm22.app.R;
 import com.midterm22.app.model.Order;
 
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,7 +66,22 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         public void bind(Order order, OnOrderClickListener listener) {
             tvOrderId.setText("Đơn hàng #" + order.getId().substring(0, 6));
-            tvDate.setText(order.getCreatedAt());
+            String createdAt = order.getCreatedAt();
+            String formattedDate = createdAt != null ? createdAt : "N/A";
+            try {
+                long timestamp = Long.parseLong(createdAt);
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+                formattedDate = sdf.format(new Date(timestamp));
+            } catch (NumberFormatException e) {
+                try {
+                    String[] parts = createdAt.split(" ");
+                    String[] dateParts = parts[0].split("-");
+                    formattedDate = String.format("%s/%s/%s %s", dateParts[2], dateParts[1], dateParts[0], parts[1].substring(0, 5));
+                } catch (Exception ex) {
+                    Log.w("OrderAdapter", "Error formatting date: " + createdAt);
+                }
+            }
+            tvDate.setText(formattedDate);
 
             NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
             tvTotal.setText(format.format(order.getTotal()));

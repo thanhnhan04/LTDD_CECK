@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -95,6 +96,13 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             int centerX = endLocation[0] + cartWidth / 2;
             int centerY = endLocation[1] + cartHeight / 2;
 
+
+            MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.tin);
+            mediaPlayer.setOnCompletionListener(mp -> {
+                mp.release();  // Giải phóng bộ nhớ
+            });
+            mediaPlayer.start();
+
             // Tạo image di chuyển từ nút "Add to Cart" đến giỏ hàng
             ImageView imageView = new ImageView(context);
             imageView.setImageResource(R.drawable.ic_pickup);
@@ -111,6 +119,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             animatorSet.playTogether(translateX, translateY, fadeOut);  // Kết hợp các animation
             animatorSet.setDuration(1000); // Thời gian di chuyển (1000ms)
             animatorSet.start();
+
+
 
             // Sau khi di chuyển hoàn tất, thêm sản phẩm vào giỏ hàng
             animatorSet.addListener(new AnimatorListenerAdapter() {
@@ -136,6 +146,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         });
 
     }
+
 
 
     @Override
