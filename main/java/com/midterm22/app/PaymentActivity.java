@@ -2,7 +2,6 @@ package com.midterm22.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,6 +10,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,76 +28,93 @@ import com.midterm22.app.model.CartItem;
 import com.midterm22.app.model.Order;
 import com.midterm22.app.model.OrderItem;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class PaymentActivity extends AppCompatActivity {
 
     private RecyclerView rvPaymentItems;
     private PaymentAdapter paymentAdapter;
     private TextView tvTotalPrice, tvSubTotalPrice;
-    private TextView edtName, edtPhone, edtAddress;
+    private TextView edtName, edtPhone, edtAddress, edtNote;
+    private TextView paymentTextView;
+    private RadioGroup radioGroup;
     private DatabaseReference mDatabase;
-    private SharedPreferences sharedPref;
+    private Button btnOrder;
+    private ActivityResultLauncher<Intent> vnpayLauncher;
+
+    private ArrayList<CartItem> finalCartItems;
+    private String currentCustomerId;
+    private String pendingOrderId;
+
+    private double finalTotal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
 
-        // Initialize Firebase Database
+        vnpayLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                        String paymentResult = result.getData().getStringExtra("payment_result");
+                        if ("success".equals(paymentResult)) {
+                            createOrder("VNPay", pendingOrderId);
+                        } else {
+                            Toast.makeText(PaymentActivity.this, "Thanh toán VNPay thất bại!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        // Map views
+        // Ánh xạ view
         rvPaymentItems = findViewById(R.id.recyclerOrderItems);
         tvTotalPrice = findViewById(R.id.tvTotal);
         tvSubTotalPrice = findViewById(R.id.tvSubtotal);
         edtName = findViewById(R.id.tv_address);
         edtAddress = findViewById(R.id.tv_name);
         edtPhone = findViewById(R.id.tv_phone);
-        EditText edtNote = findViewById(R.id.edt_note);
-        RadioGroup radioGroup = findViewById(R.id.radioPaymentMethods);
-        TextView paymentTextView = findViewById(R.id.paymentMethodTextView);
+        edtNote = findViewById(R.id.edt_note);
+        radioGroup = findViewById(R.id.radioPaymentMethods);
+        paymentTextView = findViewById(R.id.paymentMethodTextView);
+        btnOrder = findViewById(R.id.btn_order);
 
-        // Load user data from Firebase
+        // Load dữ liệu người dùng
         loadUserData();
 
-        // Get cart items from Intent
+        // Lấy danh sách giỏ hàng
         Intent intent = getIntent();
-        ArrayList<CartItem> cartItems = intent.getParcelableArrayListExtra("cart_items");
+        finalCartItems = intent.getParcelableArrayListExtra("cart_items");
+        if (finalCartItems == null) finalCartItems = new ArrayList<>();
 
-        if (cartItems == null) {
-            cartItems = new ArrayList<>();
-        }
-
-        // Setup RecyclerView adapter
-        paymentAdapter = new PaymentAdapter(this, cartItems);
+        // Setup adapter
+        paymentAdapter = new PaymentAdapter(this, finalCartItems);
         rvPaymentItems.setLayoutManager(new LinearLayoutManager(this));
         rvPaymentItems.setAdapter(paymentAdapter);
 
-        // Set up payment method listener
+        // Tổng tiền
+        finalTotal = finalCartItems.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+        tvTotalPrice.setText(String.format(" %.0fđ", finalTotal));
+        tvSubTotalPrice.setText(String.format(" %.0fđ", finalTotal));
+
+        // Chọn phương thức thanh toán
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            String selected = "Unknown";
-
-             if (checkedId == R.id.radioVNPay) selected = "VNPay";
-else selected = "Cash";
-
-            paymentTextView.setText("Thanh toán bằng: " + selected);
+            if (checkedId == R.id.radioVNPay) {
+                paymentTextView.setText("VNPay");
+            } else {
+                paymentTextView.setText("Cash");
+            }
         });
 
-        // Calculate total price
-        double total = cartItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
-        tvTotalPrice.setText(String.format(" %.0fđ", total));
-        tvSubTotalPrice.setText(String.format(" %.0fđ", total));
-
-        // Back button listener
+        // Nút back
         ImageView btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        // Order button listener
-        Button btnOrder = findViewById(R.id.btn_order);
-        ArrayList<CartItem> finalCartItems = cartItems;
+        // Nút đặt hàng
         btnOrder.setOnClickListener(v -> {
             String name = edtName.getText().toString().trim();
             String phone = edtPhone.getText().toString().trim();
@@ -113,64 +131,77 @@ else selected = "Cash";
                 return;
             }
 
-            String customerId = currentUser.getUid();
-            String orderId = mDatabase.child("orders").push().getKey();
-            if (orderId == null) {
+            currentCustomerId = currentUser.getUid();
+
+            // Tạo trước orderId
+            pendingOrderId = mDatabase.child("orders").push().getKey();
+            if (pendingOrderId == null) {
                 Toast.makeText(this, "Không thể tạo đơn hàng", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            double finalTotal = finalCartItems.stream()
-                    .mapToDouble(item -> item.getPrice() * item.getQuantity())
-                    .sum();
-            String note = edtNote.getText().toString().trim();
-            String paymentMethod = paymentTextView.getText().toString(); // Lấy giá trị từ TextView
-             // Gán vào đối tượng Order
-            // Create the order object
-            Order order = new Order();
-            order.setId(orderId);
-            order.setCustomerId(customerId);
-            order.setTotal(finalTotal);
-            order.setStatus("Pending");
-            order.setPaymentMethod(paymentMethod);
-            order.setNote(note.isEmpty() ? "" : note);
-
-            order.setCreatedAt(String.valueOf(System.currentTimeMillis()));
-            order.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
-
-            // Add order items to the order
-            for (CartItem cartItem : finalCartItems) {
-                String orderItemId = mDatabase.child("orderItems").push().getKey();
-                if (orderItemId == null) continue;
-
-                OrderItem orderItem = new OrderItem();
-                orderItem.setId(orderItemId);
-                orderItem.setProductId(cartItem.getProductId());
-                orderItem.setProductName(cartItem.getProductName());
-                orderItem.setProductImageUrl(cartItem.getProductImageUrl());
-                orderItem.setQuantity(cartItem.getQuantity());
-                orderItem.setUnitPrice(cartItem.getPrice());
-                orderItem.setTotalPrice(cartItem.getPrice() * cartItem.getQuantity());
-
-                // Add to the order's items
-                order.getItems().put(orderItemId, orderItem);
+            if ("VNPay".equals(paymentTextView.getText().toString())) {
+                Intent i = new Intent(PaymentActivity.this, VNPayFakeActivity.class);
+                i.putExtra("order_id", pendingOrderId);
+                i.putExtra("total_amount", finalTotal);
+                vnpayLauncher.launch(i);
+            } else {
+                createOrder("Cash", pendingOrderId);
             }
-
-            // Save order to Firebase
-            mDatabase.child("orders").child(orderId).setValue(order.toMap())
-                    .addOnSuccessListener(aVoid -> {
-                        CartStorageHelper.clearCart(PaymentActivity.this, currentUser.getUid());
-                        Toast.makeText(PaymentActivity.this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
-                        Intent menuIntent = new Intent(PaymentActivity.this, MenuActivity.class);
-                        menuIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(menuIntent);
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(PaymentActivity.this, "Lỗi khi đặt hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
         });
+
+
     }
+
+    private void createOrder(String paymentMethod, String orderId) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return;
+
+        String customerId = currentUser.getUid();
+
+        String note = edtNote.getText().toString().trim();
+
+        Order order = new Order();
+        order.setId(orderId);
+        order.setCustomerId(customerId);
+        order.setTotal(finalTotal);
+        order.setStatus("Pending");
+        order.setPaymentMethod(paymentMethod);
+        order.setNote(note.isEmpty() ? "" : note);
+        order.setCreatedAt(String.valueOf(System.currentTimeMillis()));
+        order.setUpdatedAt(String.valueOf(System.currentTimeMillis()));
+
+        for (CartItem cartItem : finalCartItems) {
+            String orderItemId = mDatabase.child("orderItems").push().getKey();
+            if (orderItemId == null) continue;
+
+            OrderItem orderItem = new OrderItem();
+            orderItem.setId(orderItemId);
+            orderItem.setProductId(cartItem.getProductId());
+            orderItem.setProductName(cartItem.getProductName());
+            orderItem.setProductImageUrl(cartItem.getProductImageUrl());
+            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setUnitPrice(cartItem.getPrice());
+            orderItem.setTotalPrice(cartItem.getPrice() * cartItem.getQuantity());
+
+            order.getItems().put(orderItemId, orderItem);
+        }
+
+        mDatabase.child("orders").child(orderId).setValue(order.toMap())
+                .addOnSuccessListener(aVoid -> {
+                    CartStorageHelper.clearCart(PaymentActivity.this, customerId);
+                    Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(PaymentActivity.this, MenuActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi khi đặt hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
 
     private void loadUserData() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -180,28 +211,19 @@ else selected = "Cash";
 
             userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        String name = dataSnapshot.child("name").getValue(String.class);
-                        String phone = dataSnapshot.child("phone").getValue(String.class);
-                        String address = dataSnapshot.child("address").getValue(String.class);
-
-                        edtName.setText("Tên: " + name);
-                        edtPhone.setText("Số điện thoại: " + phone);
-                        edtAddress.setText("Địa chỉ: " + address);
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        edtName.setText(snapshot.child("name").getValue(String.class));
+                        edtPhone.setText(snapshot.child("phone").getValue(String.class));
+                        edtAddress.setText(snapshot.child("address").getValue(String.class));
                     }
                 }
 
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(PaymentActivity.this, "Lỗi khi tải thông tin người dùng", Toast.LENGTH_SHORT).show();
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(PaymentActivity.this, "Không thể tải thông tin người dùng", Toast.LENGTH_SHORT).show();
                 }
             });
         }
-    }
-
-    private String formatCurrency(double amount) {
-        NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        return format.format(amount);
     }
 }

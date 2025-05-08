@@ -241,7 +241,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hủy đơn hàng"
-                android:backgroundTint="#FF5252"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/btnReceiveOrder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đã nhận hàng"
+                android:backgroundTint="@color/colorPrimary"
                 android:textColor="@android:color/white"
                 android:visibility="gone"/>
 
@@ -253,6 +262,7 @@
                 android:layout_marginStart="16dp"
                 android:backgroundTint="@color/colorPrimary"
                 android:textColor="@android:color/white"/>
+
         </LinearLayout>
     </LinearLayout>
     </ScrollView>

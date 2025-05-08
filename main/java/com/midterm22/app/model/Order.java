@@ -8,7 +8,7 @@ public class Order {
     private String customerId;
     private Map<String, OrderItem> items;
     private double total;
-    private String status; // "pending", "processing", "completed", "cancelled"
+    private String status; // "pending", "processing", "shipping", "completed", "cancelled"
     private String createdAt;
     private String updatedAt;
     private String note;

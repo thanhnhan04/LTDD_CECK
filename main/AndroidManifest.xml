@@ -17,9 +17,12 @@
         android:theme="@style/Theme.App"
         tools:ignore="HardcodedDebugMode"
         tools:targetApi="31">
-        <activity android:name=".OrderHistoryActivity"
+        <activity
+            android:name=".VNPayFakeActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".OrderHistoryActivity"
+            android:exported="false" />
         <activity
             android:name=".DealActivity"
             android:exported="false" />

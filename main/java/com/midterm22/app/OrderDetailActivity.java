@@ -33,7 +33,7 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private TextView tvOrderId, tvOrderDate, tvOrderStatus, tvSubtotal, tvShippingFee, tvTotal, tvOrderNote, tvPaymentMethod;
     private RecyclerView recyclerOrderItems;
-    private Button btnCancelOrder, btnReorder;
+    private Button btnCancelOrder, btnReorder, btnReceiveorder;
     private OrderItemAdapter adapter;
     private List<OrderItem> orderItems = new ArrayList<>();
     private DatabaseReference ordersRef, orderItemsRef;
@@ -68,6 +68,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         recyclerOrderItems = findViewById(R.id.recyclerOrderItems);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
         btnReorder = findViewById(R.id.btnReorder);
+        btnReceiveorder = findViewById(R.id.btnReceiveOrder);
         tvOrderNote = findViewById(R.id.tvOrderNote);
         tvPaymentMethod = findViewById(R.id.tvPaymentMethod);
 
@@ -163,6 +164,7 @@ public class OrderDetailActivity extends AppCompatActivity {
             case "Shipping":
                 statusText = "ĐANG GIAO";
                 bgColor = 0xFF1976D2; // Blue
+                btnReceiveorder.setVisibility(View.VISIBLE);
                 btnReorder.setVisibility(View.GONE);
                 break;
             case "Complete":
@@ -186,6 +188,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     private void setupButtons() {
         btnCancelOrder.setOnClickListener(v -> cancelOrder());
         btnReorder.setOnClickListener(v -> reorder());
+        btnReceiveorder.setOnClickListener(v -> receiveorder());
     }
 
     private void cancelOrder() {
@@ -209,4 +212,16 @@ public class OrderDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Lỗi khi đặt lại đơn: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
+
+    private void receiveorder() {
+        ordersRef.child("status").setValue("Complete")
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Đã nhận hàng thành công", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Lỗi khi nhận đơn: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
 }
