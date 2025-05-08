@@ -117,7 +117,32 @@
                 android:textSize="12sp"/>
         </LinearLayout>
     </LinearLayout>
-    <!-- Nút Giỏ Hàng với Container để thêm Badge -->
+
+    <!-- Nút Chatbot -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/chatbot_button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/cart_button_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp">
+
+        <ImageButton
+            android:id="@+id/chatbot_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_circle_cart"
+            android:src="@drawable/ic_chatbot"
+            android:scaleType="centerInside"
+            android:contentDescription="Chatbot hỗ trợ"
+            android:elevation="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            tools:ignore="MissingConstraints" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Nút Giỏ Hàng -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cart_button_container"
         android:layout_width="wrap_content"
@@ -140,7 +165,6 @@
             android:focusable="true"
             tools:ignore="MissingConstraints" />
 
-        <!-- Badge hiển thị số lượng -->
         <TextView
             android:id="@+id/cart_badge"
             android:layout_width="20dp"
@@ -154,7 +178,27 @@
             app:layout_constraintEnd_toEndOf="@id/cart_button"
             android:layout_marginTop="-5dp"
             android:layout_marginEnd="-5dp"/>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- WebView toàn màn hình để hiển thị chatbot -->
+    <WebView
+        android:id="@+id/chatbotWebView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <!-- Nút đóng chatbot -->
+    <ImageButton
+        android:id="@+id/closeChatButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="12dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/c_arrow_back"
+        android:contentDescription="Đóng chatbot"
+        android:visibility="gone"
+        android:layout_gravity="top|end"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,9 +1,13 @@
 package com.midterm22.app;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -75,6 +79,34 @@ public class BaseActivity extends AppCompatActivity {
                 navigateToActivity(MoreActivity.class);
             }
         });
+
+        WebView chatbotWebView = findViewById(R.id.chatbotWebView);
+        ImageButton chatbotButton = findViewById(R.id.chatbot_button);
+        ImageButton closeChatButton = findViewById(R.id.closeChatButton);
+
+        chatbotButton.setOnClickListener(v -> {
+            chatbotWebView.setVisibility(View.VISIBLE);
+            closeChatButton.setVisibility(View.VISIBLE);
+            chatbotWebView.getSettings().setJavaScriptEnabled(true);
+            chatbotWebView.setWebViewClient(new WebViewClient());
+            chatbotWebView.loadUrl("https://mobileapp-ccbd4.web.app/#/chat");
+        });
+
+        closeChatButton.setOnClickListener(v -> {
+            chatbotWebView.setVisibility(View.GONE);
+            closeChatButton.setVisibility(View.GONE);
+        });
+
+
+    }
+    @Override
+    public void onBackPressed() {
+        WebView chatbotWebView = findViewById(R.id.chatbotWebView);
+        if (chatbotWebView.getVisibility() == View.VISIBLE) {
+            chatbotWebView.setVisibility(View.GONE); // Ẩn WebView thay vì thoát app
+        } else {
+            super.onBackPressed(); // Thoát như bình thường
+        }
     }
 
     // Phương thức cập nhật số lượng giỏ hàng
