@@ -21,7 +21,6 @@ public class DealActivity extends BaseActivity {
         setupBottomNavigation(R.layout.activity_deal);
 
 
-
         recyclerDeals = findViewById(R.id.recyclerDeals);
         recyclerDeals.setLayoutManager(new LinearLayoutManager(this));
 
