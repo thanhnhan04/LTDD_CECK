@@ -126,22 +126,28 @@ public class AdminActivity extends AppCompatActivity {
 
                 Calendar calendar = Calendar.getInstance();
                 int currentYear = calendar.get(Calendar.YEAR);
-                int currentMonth = calendar.get(Calendar.MONTH) + 1; // Lưu ý: MONTH bắt đầu từ 0
+                int currentMonth = calendar.get(Calendar.MONTH) + 1; 
 
                 for (DataSnapshot orderSnap : snapshot.getChildren()) {
                     String status = orderSnap.child("status").getValue(String.class);
-                    if (status != null && status.equalsIgnoreCase("complete")) {
-                        // Lấy ngày đặt hàng, giả sử bạn lưu ngày dưới dạng timestamp hoặc yyyy-MM-dd
+                    if (status != null && status.equalsIgnoreCase("Complete")) {
                         String orderDateStr = orderSnap.child("createdAt").getValue(String.class);
-                        // Parse orderDateStr thành năm, tháng (nếu định dạng yyyy-MM-dd)
-                        if (orderDateStr != null && orderDateStr.length() >= 7) {
-                            int orderYear = Integer.parseInt(orderDateStr.substring(0,4));
-                            int orderMonth = Integer.parseInt(orderDateStr.substring(5,7));
+                        if (orderDateStr != null) {
+                            try {
+                                long timestamp = Long.parseLong(orderDateStr);
+                                Calendar orderCalendar = Calendar.getInstance();
+                                orderCalendar.setTimeInMillis(timestamp);
 
-                            Double orderPrice = orderSnap.child("total").getValue(Double.class);
-                            if (orderYear == currentYear && orderMonth == currentMonth && orderPrice != null && orderPrice > 0) {
-                                monthlyOrdersCount++;
-                                monthlyRevenueValue += orderPrice;
+                                int orderYear = orderCalendar.get(Calendar.YEAR);
+                                int orderMonth = orderCalendar.get(Calendar.MONTH) + 1;
+
+                                Double orderPrice = orderSnap.child("total").getValue(Double.class);
+                                if (orderYear == currentYear && orderMonth == currentMonth && orderPrice != null && orderPrice > 0) {
+                                    monthlyOrdersCount++;
+                                    monthlyRevenueValue += orderPrice;
+                                }
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -150,6 +156,7 @@ public class AdminActivity extends AppCompatActivity {
                 tvOrderCount.setText(monthlyOrdersCount + " đơn hàng tháng này");
                 tvRevenue.setText(String.format("%,.0f VNĐ", monthlyRevenueValue));
             }
+
 
             @Override
             public void onCancelled(DatabaseError error) {
