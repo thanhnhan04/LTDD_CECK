@@ -74,7 +74,7 @@
 
             <!-- Ưu đãi của tôi -->
             <LinearLayout
-                android:id="@+id/deal_id"
+                android:id="@+id/deal_section_id"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:orientation="horizontal"

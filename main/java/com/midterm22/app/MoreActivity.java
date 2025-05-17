@@ -42,7 +42,7 @@ public class MoreActivity extends BaseActivity {
         lout_support = findViewById(R.id.lout_support);
         edit_account = findViewById(R.id.edit_account);
         inf_policy = findViewById(R.id.inf_policy);
-        deal_id = findViewById(R.id.deal_id);
+        deal_id = findViewById(R.id.deal_section_id);
         sharedPref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
     }
 

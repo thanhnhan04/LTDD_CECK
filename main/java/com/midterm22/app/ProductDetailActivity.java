@@ -2,6 +2,7 @@ package com.midterm22.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.*;
@@ -102,7 +103,11 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                             Log.d("AddToCart", "Add to cart clicked for product: " + item.getProductName());
                             addToCart(item);
-
+                            MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.tin);
+                            mediaPlayer.setOnCompletionListener(mp -> {
+                                mp.release();  // Giải phóng bộ nhớ
+                            });
+                            mediaPlayer.start();
                             Toast.makeText(ProductDetailActivity.this, "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
                         });
 

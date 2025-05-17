@@ -3,6 +3,7 @@ package com.midterm22.app;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 public class BaseActivity extends AppCompatActivity {
     // Khai báo
@@ -85,12 +87,14 @@ public class BaseActivity extends AppCompatActivity {
         ImageButton closeChatButton = findViewById(R.id.closeChatButton);
 
         chatbotButton.setOnClickListener(v -> {
-            chatbotWebView.setVisibility(View.VISIBLE);
             closeChatButton.setVisibility(View.VISIBLE);
+            chatbotWebView.setVisibility(View.VISIBLE);
+            chatbotWebView.setBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorPrimary));
             chatbotWebView.getSettings().setJavaScriptEnabled(true);
             chatbotWebView.setWebViewClient(new WebViewClient());
             chatbotWebView.loadUrl("https://mobileapp-ccbd4.web.app/#/chat");
         });
+
 
         closeChatButton.setOnClickListener(v -> {
             chatbotWebView.setVisibility(View.GONE);

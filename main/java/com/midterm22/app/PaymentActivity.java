@@ -28,6 +28,7 @@ import com.midterm22.app.model.CartItem;
 import com.midterm22.app.model.Order;
 import com.midterm22.app.model.OrderItem;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class PaymentActivity extends AppCompatActivity {
@@ -61,10 +62,11 @@ public class PaymentActivity extends AppCompatActivity {
                         if ("success".equals(paymentResult)) {
                             createOrder("VNPay", pendingOrderId);
                         } else {
-                            Toast.makeText(PaymentActivity.this, "Thanh toán VNPay thất bại!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PaymentActivity.this, "Thanh toán không thành công!", Toast.LENGTH_SHORT).show();
                         }
                     }
-                });
+                }
+        );
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -98,8 +100,10 @@ public class PaymentActivity extends AppCompatActivity {
         finalTotal = finalCartItems.stream()
                 .mapToDouble(item -> item.getPrice() * item.getQuantity())
                 .sum();
-        tvTotalPrice.setText(String.format(" %.0fđ", finalTotal));
-        tvSubTotalPrice.setText(String.format(" %.0fđ", finalTotal));
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        tvTotalPrice.setText(String.format("%sđ", formatter.format(finalTotal)));
+        tvSubTotalPrice.setText(String.format("%sđ", formatter.format(finalTotal)));
+
 
         // Chọn phương thức thanh toán
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
@@ -141,10 +145,11 @@ public class PaymentActivity extends AppCompatActivity {
             }
 
             if ("VNPay".equals(paymentTextView.getText().toString())) {
-                Intent i = new Intent(PaymentActivity.this, VNPayFakeActivity.class);
-                i.putExtra("order_id", pendingOrderId);
-                i.putExtra("total_amount", finalTotal);
-                vnpayLauncher.launch(i);
+                String paymentUrl = VnpayHelper.createPaymentUrl(pendingOrderId,String.valueOf((int) finalTotal), "", "vn");
+                Intent intentt = new Intent(PaymentActivity.this, VNPayWebViewActivity.class);
+                intentt.putExtra(VNPayWebViewActivity.EXTRA_PAYMENT_URL, paymentUrl);
+                vnpayLauncher.launch(intentt);
+
             } else {
                 createOrder("Cash", pendingOrderId);
             }
@@ -191,8 +196,9 @@ public class PaymentActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     CartStorageHelper.clearCart(PaymentActivity.this, customerId);
                     Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(PaymentActivity.this, MenuActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Intent intent = new Intent(this, PaymentSuccessActivity.class);
+                    intent.putExtra("order_id", pendingOrderId);
+                    intent.putExtra("amount", finalTotal);
                     startActivity(intent);
                     finish();
                 })
