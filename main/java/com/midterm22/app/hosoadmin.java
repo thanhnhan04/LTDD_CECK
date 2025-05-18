@@ -69,7 +69,7 @@ public class hosoadmin extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     // Retrieve user data
-                    String fullName = snapshot.child("fullName").getValue(String.class);
+                    String fullName = snapshot.child("name").getValue(String.class);
                     String email = snapshot.child("email").getValue(String.class);
                     String phone = snapshot.child("phone").getValue(String.class);
                     String address = snapshot.child("address").getValue(String.class);
