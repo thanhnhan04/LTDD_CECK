@@ -5,11 +5,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,7 +36,10 @@ public class OrderDetailActivity extends AppCompatActivity {
 
     private TextView tvOrderId, tvOrderDate, tvOrderStatus, tvSubtotal, tvShippingFee, tvTotal, tvOrderNote, tvPaymentMethod;
     private RecyclerView recyclerOrderItems;
-    private Button btnCancelOrder, btnReorder, btnReceiveorder;
+    private Button btnCancelOrder, btnReorder, btnReceiveorder, btnReview;
+    private CardView layoutRated;
+    private TextView tvRatedComment;
+    private RatingBar tvRatedScore;
     private OrderItemAdapter adapter;
     private List<OrderItem> orderItems = new ArrayList<>();
     private DatabaseReference ordersRef, orderItemsRef;
@@ -69,11 +75,45 @@ public class OrderDetailActivity extends AppCompatActivity {
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
         btnReorder = findViewById(R.id.btnReorder);
         btnReceiveorder = findViewById(R.id.btnReceiveOrder);
+        btnReview = findViewById(R.id.btnReview);
         tvOrderNote = findViewById(R.id.tvOrderNote);
         tvPaymentMethod = findViewById(R.id.tvPaymentMethod);
 
+        layoutRated = findViewById(R.id.layoutRated);
+        tvRatedScore = findViewById(R.id.ratingBarRated);
+        tvRatedComment = findViewById(R.id.tvRatedComment);
+
+
         ordersRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
         orderItemsRef = FirebaseDatabase.getInstance().getReference("orderItems");
+    }
+    private void checkReview(String orderId) {
+        DatabaseReference reviewRef = FirebaseDatabase.getInstance().getReference("reviews").child(orderId);
+        reviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Đã đánh giá
+                    Long rating = snapshot.child("rating").getValue(Long.class); // hoặc Integer
+                    String comment = snapshot.child("comment").getValue(String.class);
+
+                    layoutRated.setVisibility(View.VISIBLE);
+                    tvRatedScore.setRating(rating);
+                    tvRatedComment.setText("Phản hồi: "+comment);
+
+                    btnReview.setVisibility(View.GONE);
+                } else {
+                    // Chưa đánh giá
+                    layoutRated.setVisibility(View.GONE);
+                    btnReview.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("OrderDetail", "Lỗi khi kiểm tra đánh giá: " + error.getMessage());
+            }
+        });
     }
 
     private void setupRecyclerView() {
@@ -137,11 +177,14 @@ public class OrderDetailActivity extends AppCompatActivity {
         NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
         tvSubtotal.setText(format.format(order.getTotal()));
         tvTotal.setText(format.format(order.getTotal()));
-// Phương thức thanh toán
+        // Phương thức thanh toán
         String payment = order.getPaymentMethod();
         tvPaymentMethod.setText(payment != null && !payment.isEmpty() ? payment : "Chưa rõ");
         // Hiển thị trạng thái
         setOrderStatusUI(order.getStatus());
+        if ("Complete".equals(order.getStatus())) {
+            checkReview(orderId);
+        }
     }
 
     private void setOrderStatusUI(String status) {
@@ -170,6 +213,7 @@ public class OrderDetailActivity extends AppCompatActivity {
             case "Complete":
                 statusText = "HOÀN THÀNH";
                 bgColor = 0xFF388E3C; // Green
+                btnReview.setVisibility(View.VISIBLE);
                 btnReorder.setVisibility(View.GONE);
                 break;
             case "Cancelled":
@@ -189,6 +233,12 @@ public class OrderDetailActivity extends AppCompatActivity {
         btnCancelOrder.setOnClickListener(v -> cancelOrder());
         btnReorder.setOnClickListener(v -> reorder());
         btnReceiveorder.setOnClickListener(v -> receiveorder());
+        btnReview.setOnClickListener(v -> openReviewDialog());
+
+    }
+    private void openReviewDialog() {
+        ReviewDialogFragment dialog = ReviewDialogFragment.newInstance(orderId);
+        dialog.show(getSupportFragmentManager(), "ReviewDialog");
     }
 
     private void cancelOrder() {

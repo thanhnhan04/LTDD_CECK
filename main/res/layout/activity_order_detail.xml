@@ -14,7 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="#B71C1C"
         android:elevation="4dp"
-        android:layout_marginTop="0dp"> <!-- Remove top margin to make it stick to the top -->
+        android:layout_marginTop="0dp">
 
         <ImageButton
             android:id="@+id/btn_back"
@@ -36,8 +36,7 @@
             android:layout_gravity="center" />
     </com.google.android.material.appbar.MaterialToolbar>
 
-
-    <!-- Phần nội dung có thể scroll -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -45,225 +44,284 @@
         android:padding="16dp"
         android:fillViewport="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <!-- Header Section -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginBottom="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/tvOrderId"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"
-                    android:textStyle="bold"/>
-
-                <TextView
-                    android:id="@+id/tvOrderDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@android:color/darker_gray"/>
-
-                <TextView
-                    android:id="@+id/tvOrderStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:padding="4dp"
-                    android:background="@drawable/bg_order_status"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Items Section -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chi tiết đơn hàng"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerOrderItems"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"/>
-
-        <!-- Summary Section -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="8dp"
-            android:layout_marginTop="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <!-- Subtotal -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tạm tính:"/>
-
-                    <TextView
-                        android:id="@+id/tvSubtotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
-
-                <!-- Shipping Fee -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Phí vận chuyển:"/>
-
-                    <TextView
-                        android:id="@+id/tvShippingFee"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
-
-                <!-- Order Note -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ghi chú:"/>
-
-                    <TextView
-                        android:id="@+id/tvOrderNote"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:text="Không có ghi chú"/>
-                </LinearLayout>
-
-                <!-- Payment Method -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Phương thức thanh toán:"/>
-
-                    <TextView
-                        android:id="@+id/tvPaymentMethod"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#EEEEEE"
-                    android:layout_marginVertical="8dp"/>
-
-                <!-- Total -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tổng cộng:"
-                        android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/tvTotal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@color/colorPrimary"/>
-                </LinearLayout>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-
-        <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="16dp"
-            android:gravity="center_horizontal">
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnCancelOrder"
-                android:layout_width="wrap_content"
+            <!-- Order Header -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hủy đơn hàng"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvOrderId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvOrderDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@android:color/darker_gray"/>
+
+                    <TextView
+                        android:id="@+id/tvOrderStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:padding="4dp"
+                        android:background="@drawable/bg_order_status"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Items Title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Chi tiết đơn hàng"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerOrderItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+            <!-- Summary Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="8dp"
+                android:layout_marginTop="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Subtotal -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tạm tính:"/>
+
+                        <TextView
+                            android:id="@+id/tvSubtotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
+                    <!-- Shipping Fee -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phí vận chuyển:"/>
+
+                        <TextView
+                            android:id="@+id/tvShippingFee"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
+                    <!-- Note -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ghi chú:"/>
+
+                        <TextView
+                            android:id="@+id/tvOrderNote"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="Không có ghi chú"/>
+                    </LinearLayout>
+
+                    <!-- Payment Method -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phương thức thanh toán:"/>
+
+                        <TextView
+                            android:id="@+id/tvPaymentMethod"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"/>
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#EEEEEE"
+                        android:layout_marginVertical="8dp"/>
+
+                    <!-- Total -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tổng cộng:"
+                            android:textStyle="bold"/>
+
+                        <TextView
+                            android:id="@+id/tvTotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            android:textSize="18sp"
+                            android:layout_marginStart="8dp"
+                            android:textColor="@color/colorPrimary"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Action Buttons (horizontal row) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:gravity="center_horizontal">
+
+                <Button
+                    android:id="@+id/btnCancelOrder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hủy đơn hàng"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/btnReceiveOrder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đã nhận hàng"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:textColor="@android:color/white"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/btnReorder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đặt lại"
+                    android:layout_marginStart="16dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:textColor="@android:color/white"/>
+            </LinearLayout>
+
+            <!-- Đánh giá đơn hàng -->
+            <Button
+                android:id="@+id/btnReview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đánh giá đơn hàng"
+                android:layout_marginTop="16dp"
                 android:backgroundTint="@color/colorPrimary"
                 android:textColor="@android:color/white"
-                android:visibility="gone"/>
-
-            <Button
-                android:id="@+id/btnReceiveOrder"
-                android:layout_width="wrap_content"
+                android:visibility="gone" />
+            <androidx.cardview.widget.CardView
+                android:id="@+id/layoutRated"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Đã nhận hàng"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@android:color/white"
-                android:visibility="gone"/>
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:visibility="gone"
+                android:layout_marginBottom="16dp">
 
-            <Button
-                android:id="@+id/btnReorder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đặt lại"
-                android:layout_marginStart="16dp"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@android:color/white"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center_horizontal"
+                    android:background="@android:color/white">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⭐ Đánh giá của bạn"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp"/>
+
+                    <RatingBar
+                        android:id="@+id/ratingBarRated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:numStars="5"
+                        android:stepSize="0.5"
+                        android:rating="5"
+                        android:isIndicator="true"
+                        android:layout_marginBottom="8dp"
+                        style="@style/Widget.AppCompat.RatingBar.Small"
+                        android:theme="@style/RatingBarGoldTheme" />
+
+                    <TextView
+                        android:id="@+id/tvRatedComment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Món ăn rất ngon, giao hàng nhanh và đóng gói cẩn thận. Rất hài lòng!"
+                        android:textColor="#333333"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:layout_marginBottom="8dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
-    </LinearLayout>
     </ScrollView>
 </LinearLayout>

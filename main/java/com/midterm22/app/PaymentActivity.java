@@ -75,8 +75,8 @@ public class PaymentActivity extends AppCompatActivity {
         rvPaymentItems = findViewById(R.id.recyclerOrderItems);
         tvTotalPrice = findViewById(R.id.tvTotal);
         tvSubTotalPrice = findViewById(R.id.tvSubtotal);
-        edtName = findViewById(R.id.tv_address);
-        edtAddress = findViewById(R.id.tv_name);
+        edtName = findViewById(R.id.tv_name);
+        edtAddress = findViewById(R.id.tv_address);
         edtPhone = findViewById(R.id.tv_phone);
         edtNote = findViewById(R.id.edt_note);
         radioGroup = findViewById(R.id.radioPaymentMethods);

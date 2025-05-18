@@ -1,6 +1,7 @@
 package com.midterm22.app;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,6 +54,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 .into(holder.img_food);
 
         holder.btnIncrease.setOnClickListener(v -> {
+            MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.tin);
+            mediaPlayer.setOnCompletionListener(mp -> {
+                mp.release();  // Giải phóng bộ nhớ
+            });
+            mediaPlayer.start();
             item.setQuantity(item.getQuantity() + 1);
             notifyItemChanged(position);
             notifyCartChanged();
@@ -60,13 +66,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         holder.btnDecrease.setOnClickListener(v -> {
             if (item.getQuantity() > 1) {
+                MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.tin);
+                mediaPlayer.setOnCompletionListener(mp -> {
+                    mp.release();
+                });
+                mediaPlayer.start();
                 item.setQuantity(item.getQuantity() - 1);
                 notifyItemChanged(position);
                 notifyCartChanged();
             }
         });
         holder.btnDelete.setOnClickListener(v -> {
-            // Xóa khỏi map & danh sách
             cartItemMap.remove(item.getProductId());
             cartItemList.remove(position);
             notifyItemRemoved(position);

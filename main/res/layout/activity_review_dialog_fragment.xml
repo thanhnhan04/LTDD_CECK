@@ -1,0 +1,24 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="24dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RatingBar
+        android:id="@+id/ratingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:stepSize="1.0"
+        android:layout_gravity="center"
+        android:theme="@style/RatingBarGoldTheme" />
+    <EditText
+        android:id="@+id/editReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập nhận xét của bạn"
+        android:inputType="textMultiLine"
+        android:lines="3"
+        android:gravity="top"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
