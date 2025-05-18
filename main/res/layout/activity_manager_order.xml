@@ -36,17 +36,6 @@
                     android:textStyle="bold" />
 
                 <!-- SearchView -->
-                <androidx.appcompat.widget.SearchView
-                    android:id="@+id/searchView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="42dp"
-                    android:layout_toStartOf="@id/btnProfile"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:iconifiedByDefault="false"
-                    android:queryHint="Tìm kiếm đơn hàng..."
-                    app:searchIcon="@drawable/ic_search" />
 
                 <!-- Nút thông tin cá nhân -->
                 <ImageView

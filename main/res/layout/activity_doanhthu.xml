@@ -36,17 +36,6 @@
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
-                <ImageButton
-                    android:id="@+id/btnSearch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="42dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Search"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_search" />
-
                 <ImageView
                     android:id="@+id/btnProfile"
                     android:layout_width="wrap_content"

@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,16 +37,19 @@ import java.util.Locale;
 
 public class OrderDetailAdminActivity extends AppCompatActivity {
 
-    private TextView tvOrderId, tvOrderDate, tvTotalAmount, tvCustomerName, tvCustomerPhone, tvCustomerAddress, tvTotalAmountFooter;
+    private TextView tvOrderId, tvOrderDate, tvTotalAmount, tvCustomerName, tvCustomerPhone, tvCustomerAddress, tvReviewComment, tvOrderNote, tvPaymentMethod;
     private RecyclerView rvOrderItems;
     private Button btnCancelOrder;
     private Spinner spinnerUpdateStatus;
     private ImageButton btnSearch;
     private ImageView btnProfile;
+    private RatingBar ratingBarReview;
+    private CardView layoutReview;
     private OrderItemAdapter itemAdapter;
     private List<OrderItem> orderItems = new ArrayList<>();
     private String orderId;
     private List<String> statusList = Arrays.asList("Pending", "Confirm", "Shipping", "Complete", "Cancelled");
+    private String currentStatus; // Lưu trạng thái hiện tại
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +78,16 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
         tvCustomerName = findViewById(R.id.tvCustomerName);
         tvCustomerPhone = findViewById(R.id.tvCustomerPhone);
         tvCustomerAddress = findViewById(R.id.tvCustomerAddress);
-        tvTotalAmountFooter = findViewById(R.id.tvTotalAmountFooter);
+        tvReviewComment = findViewById(R.id.tvReviewComment);
+        tvOrderNote = findViewById(R.id.tvOrderNote);
+        tvPaymentMethod = findViewById(R.id.tvPaymentMethod);
         rvOrderItems = findViewById(R.id.rvOrderItems);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
         spinnerUpdateStatus = findViewById(R.id.spinnerUpdateStatus);
         btnSearch = findViewById(R.id.btnSearch);
         btnProfile = findViewById(R.id.btnProfile);
+        ratingBarReview = findViewById(R.id.ratingBarReview);
+        layoutReview = findViewById(R.id.layoutReview);
 
         // Thiết lập RecyclerView cho danh sách sản phẩm
         rvOrderItems.setLayoutManager(new LinearLayoutManager(this));
@@ -136,7 +145,6 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
                 // Hiển thị thông tin đơn hàng
                 tvOrderId.setText(order.getId());
                 tvTotalAmount.setText(formatCurrency(order.getTotal()));
-                tvTotalAmountFooter.setText(formatCurrency(order.getTotal()));
 
                 // Định dạng ngày
                 String createdAt = order.getCreatedAt();
@@ -150,13 +158,21 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
                 }
                 tvOrderDate.setText(formattedDate);
 
-                // Hiển thị trạng thái hiện tại trong Spinner
-                String currentStatus = order.getStatus() != null ? order.getStatus() : "Đang chờ";
+                // Hiển thị ghi chú món ăn
+                String note = order.getNote() != null ? order.getNote() : "";
+                tvOrderNote.setText(note);
+
+                // Hiển thị phương thức thanh toán
+                String paymentMethod = order.getPaymentMethod() != null ? order.getPaymentMethod() : "N/A";
+                tvPaymentMethod.setText(paymentMethod);
+
+                // Lưu và hiển thị trạng thái hiện tại trong Spinner
+                currentStatus = order.getStatus() != null ? order.getStatus() : "Pending";
                 int statusIndex = statusList.indexOf(currentStatus);
                 if (statusIndex != -1) {
                     spinnerUpdateStatus.setSelection(statusIndex);
                 } else {
-                    spinnerUpdateStatus.setSelection(0); // Mặc định là "Đang chờ"
+                    spinnerUpdateStatus.setSelection(0); // Mặc định là "Pending"
                 }
 
                 // Lấy thông tin khách hàng
@@ -164,6 +180,13 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
 
                 // Lấy danh sách sản phẩm
                 fetchOrderItems();
+
+                // Nếu trạng thái là "Complete", lấy thông tin đánh giá
+                if ("Complete".equals(currentStatus)) {
+                    fetchOrderReview();
+                } else {
+                    layoutReview.setVisibility(CardView.GONE);
+                }
             }
 
             @Override
@@ -233,12 +256,39 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchOrderReview() {
+        DatabaseReference reviewRef = FirebaseDatabase.getInstance().getReference("reviews").child(orderId);
+        reviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String comment = snapshot.child("comment").getValue(String.class);
+                    Float rating = snapshot.child("rating").getValue(Float.class);
+
+                    // Hiển thị thông tin đánh giá
+                    layoutReview.setVisibility(CardView.VISIBLE);
+                    tvReviewComment.setText(comment != null ? comment : "Chưa có bình luận");
+                    ratingBarReview.setRating(rating != null ? rating : 0);
+                } else {
+                    layoutReview.setVisibility(CardView.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(OrderDetailAdminActivity.this, "Lỗi khi lấy đánh giá: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("OrderDetailActivity", "Error loading review: " + error.getMessage());
+                layoutReview.setVisibility(CardView.GONE);
+            }
+        });
+    }
+
     private void cancelOrder() {
         DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
-        orderRef.child("status").setValue("Hủy").addOnCompleteListener(task -> {
+        orderRef.child("status").setValue("Cancelled").addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(OrderDetailAdminActivity.this, "Đơn hàng đã bị hủy!", Toast.LENGTH_SHORT).show();
-                spinnerUpdateStatus.setSelection(statusList.indexOf("Hủy"));
+                spinnerUpdateStatus.setSelection(statusList.indexOf("Cancelled"));
                 finish();
             } else {
                 Toast.makeText(OrderDetailAdminActivity.this, "Lỗi khi hủy đơn hàng!", Toast.LENGTH_SHORT).show();
@@ -247,15 +297,31 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
     }
 
     private void updateOrderStatus(String newStatus) {
+        // Kiểm tra nếu trạng thái mới không hợp lệ (quay ngược lại trạng thái trước)
+        int currentIndex = statusList.indexOf(currentStatus);
+        int newIndex = statusList.indexOf(newStatus);
+
+        if (newIndex < currentIndex) {
+            Toast.makeText(OrderDetailAdminActivity.this, "Không thể quay lại trạng thái trước!", Toast.LENGTH_SHORT).show();
+            // Đặt lại Spinner về trạng thái hiện tại
+            spinnerUpdateStatus.setSelection(currentIndex);
+            return;
+        }
+
         DatabaseReference orderRef = FirebaseDatabase.getInstance().getReference("orders").child(orderId);
         orderRef.child("status").setValue(newStatus).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(OrderDetailAdminActivity.this, "Cập nhật trạng thái thành công: " + newStatus, Toast.LENGTH_SHORT).show();
-                if (newStatus.equals("Hủy")) {
+                currentStatus = newStatus; // Cập nhật trạng thái hiện tại
+                if (newStatus.equals("Cancelled")) {
                     finish();
+                } else if (newStatus.equals("Complete")) {
+                    fetchOrderReview(); // Lấy đánh giá khi trạng thái chuyển thành Complete
                 }
             } else {
                 Toast.makeText(OrderDetailAdminActivity.this, "Lỗi khi cập nhật trạng thái!", Toast.LENGTH_SHORT).show();
+                // Đặt lại Spinner về trạng thái hiện tại nếu cập nhật thất bại
+                spinnerUpdateStatus.setSelection(currentIndex);
             }
         });
     }
