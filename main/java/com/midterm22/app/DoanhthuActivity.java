@@ -100,11 +100,9 @@ public class DoanhthuActivity extends AppCompatActivity {
             return true;
         });
 
-        btnSearch = findViewById(R.id.btnSearch);
+
         btnProfile = findViewById(R.id.btnProfile);
-        btnSearch.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng tìm kiếm đang được phát triển!", Toast.LENGTH_SHORT).show();
-        });
+
 
         btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(this,hosoadmin.class); // Thay ProfileActivity bằng activity của bạn

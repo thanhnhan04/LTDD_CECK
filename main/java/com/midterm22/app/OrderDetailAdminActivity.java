@@ -84,7 +84,7 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
         rvOrderItems = findViewById(R.id.rvOrderItems);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
         spinnerUpdateStatus = findViewById(R.id.spinnerUpdateStatus);
-        btnSearch = findViewById(R.id.btnSearch);
+//        btnSearch = findViewById(R.id.btnSearch);
         btnProfile = findViewById(R.id.btnProfile);
         ratingBarReview = findViewById(R.id.ratingBarReview);
         layoutReview = findViewById(R.id.layoutReview);
@@ -98,11 +98,6 @@ public class OrderDetailAdminActivity extends AppCompatActivity {
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, statusList);
         statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUpdateStatus.setAdapter(statusAdapter);
-
-        // Xử lý nút tìm kiếm
-        btnSearch.setOnClickListener(v -> {
-            Toast.makeText(this, "Tính năng tìm kiếm đang được phát triển!", Toast.LENGTH_SHORT).show();
-        });
 
         // Xử lý nút thông tin cá nhân
         btnProfile.setOnClickListener(v -> {

@@ -104,7 +104,6 @@ public class ManagerOrderActivity extends AppCompatActivity {
         });
 
         // Ánh xạ các nút trên Toolbar
-        searchView = findViewById(R.id.searchView); // Ánh xạ SearchView
         btnProfile = findViewById(R.id.btnProfile);
 
         // Thiết lập RecyclerView
@@ -118,7 +117,7 @@ public class ManagerOrderActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         setupMenuOptions();
-        setupSearchView();
+
 
         btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(ManagerOrderActivity.this, hosoadmin.class);
